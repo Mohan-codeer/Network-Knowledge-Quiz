@@ -1,1848 +1,1247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NW Route — Networking Quiz</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0e1a;
-    --surface: #111827;
-    --card: #1a2236;
-    --border: #2a3a5c;
-    --accent: #00d4ff;
-    --accent2: #7c3aed;
-    --accent3: #10b981;
-    --danger: #ef4444;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --correct: #10b981;
-    --wrong: #ef4444;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Header */
-  header {
-    position: relative;
-    z-index: 10;
-    padding: 24px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    background: rgba(10,14,26,0.8);
-    backdrop-filter: blur(12px);
-  }
-
-  .logo {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-
-  .logo span { color: var(--accent); }
-
-  .score-badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    background: rgba(0,212,255,0.1);
-    border: 1px solid rgba(0,212,255,0.3);
-    color: var(--accent);
-    padding: 6px 16px;
-    border-radius: 20px;
-    display: flex;
-    gap: 12px;
-  }
-
-  /* Progress bar */
-  .progress-wrap {
-    height: 3px;
-    background: var(--border);
-    position: relative;
-    z-index: 10;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    transition: width 0.4s ease;
-  }
-
-  /* Main layout */
-  main {
-    position: relative;
-    z-index: 10;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px 100px;
-  }
-
-  /* Screen: Home */
-  #home-screen {
-    text-align: center;
-    padding-top: 40px;
-  }
-
-  .tag {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    background: rgba(0,212,255,0.08);
-    border: 1px solid rgba(0,212,255,0.2);
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 24px;
-  }
-
-  h1 {
-    font-size: clamp(36px, 6vw, 64px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -2px;
-    margin-bottom: 16px;
-  }
-
-  h1 em { color: var(--accent); font-style: normal; }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: 18px;
-    max-width: 500px;
-    margin: 0 auto 48px;
-    line-height: 1.6;
-    font-weight: 400;
-  }
-
-  /* Topic grid */
-  .topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-    margin-bottom: 40px;
-    text-align: left;
-  }
-
-  .topic-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .topic-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,212,255,0.05), transparent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .topic-card:hover::before { opacity: 1; }
-  .topic-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .topic-card.selected { border-color: var(--accent); background: rgba(0,212,255,0.08); }
-  .topic-card.selected .topic-check { opacity: 1; }
-
-  .topic-icon { font-size: 24px; margin-bottom: 8px; }
-  .topic-name { font-weight: 700; font-size: 14px; }
-  .topic-count { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
-
-  .topic-check {
-    position: absolute;
-    top: 10px; right: 10px;
-    width: 18px; height: 18px;
-    background: var(--accent);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    text-decoration: none;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
-
-  .btn-primary:hover {
-    background: #00b8d9;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 30px rgba(0,212,255,0.3);
-  }
-
-  .btn-secondary {
-    background: var(--card);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Quiz screen */
-  #quiz-screen { display: none; }
-
-  .q-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .q-type-badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-  }
-
-  .badge-mcq { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
-  .badge-fitb { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
-  .badge-tf { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-  .badge-match { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-  .badge-order { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-
-  .q-counter {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .q-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .q-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
-
-  .q-number {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .q-text {
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.5;
-    margin-bottom: 28px;
-    color: #f1f5f9;
-  }
-
-  /* MCQ Options */
-  .options-grid {
-    display: grid;
-    gap: 10px;
-  }
-
-  .option {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    color: var(--text);
-  }
-
-  .option:hover:not(.disabled) {
-    border-color: var(--accent);
-    background: rgba(0,212,255,0.05);
-  }
-
-  .option.selected { border-color: var(--accent); background: rgba(0,212,255,0.1); }
-  .option.correct { border-color: var(--correct) !important; background: rgba(16,185,129,0.1) !important; }
-  .option.wrong { border-color: var(--wrong) !important; background: rgba(239,68,68,0.1) !important; }
-  .option.disabled { cursor: default; }
-
-  .opt-label {
-    width: 30px; height: 30px;
-    border-radius: 6px;
-    background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-
-  .option.selected .opt-label { background: var(--accent); color: #000; }
-  .option.correct .opt-label { background: var(--correct); color: #000; }
-  .option.wrong .opt-label { background: var(--wrong); color: #fff; }
-
-  /* True/False */
-  .tf-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .tf-btn {
-    padding: 28px 20px;
-    border-radius: 12px;
-    border: 2px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--text);
-    transition: all 0.2s;
-    text-align: center;
-  }
-
-  .tf-btn:hover:not(.disabled) { border-color: var(--accent); }
-  .tf-btn.selected { border-color: var(--accent); background: rgba(0,212,255,0.1); }
-  .tf-btn.correct { border-color: var(--correct) !important; background: rgba(16,185,129,0.15) !important; color: var(--correct) !important; }
-  .tf-btn.wrong { border-color: var(--wrong) !important; background: rgba(239,68,68,0.15) !important; color: var(--wrong) !important; }
-
-  /* Fill in blank */
-  .fitb-wrap { margin-top: 8px; }
-
-  .fitb-input {
-    width: 100%;
-    padding: 16px 20px;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .fitb-input:focus { border-color: var(--accent); }
-  .fitb-input.correct { border-color: var(--correct); }
-  .fitb-input.wrong { border-color: var(--wrong); }
-
-  /* Matching */
-  .match-wrap {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .match-col-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .match-item {
-    padding: 12px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-  }
-
-  .match-item:hover:not(.disabled) { border-color: var(--accent); }
-  .match-item.selected { border-color: var(--accent); background: rgba(0,212,255,0.1); }
-  .match-item.matched { border-color: var(--correct); background: rgba(16,185,129,0.08); }
-  .match-item.wrong-match { border-color: var(--wrong); background: rgba(239,68,68,0.08); }
-
-  .match-pair-indicator {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    margin-right: 10px;
-    flex-shrink: 0;
-  }
-
-  /* Feedback panel */
-  .feedback {
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-top: 16px;
-    display: none;
-    animation: slideUp 0.3s ease;
-  }
-
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .feedback.correct {
-    background: rgba(16,185,129,0.08);
-    border: 1px solid rgba(16,185,129,0.3);
-  }
-
-  .feedback.wrong {
-    background: rgba(239,68,68,0.06);
-    border: 1px solid rgba(239,68,68,0.25);
-  }
-
-  .feedback-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 800;
-    font-size: 15px;
-    margin-bottom: 8px;
-  }
-
-  .feedback.correct .feedback-title { color: var(--correct); }
-  .feedback.wrong .feedback-title { color: var(--wrong); }
-
-  .feedback-icon { font-size: 18px; }
-
-  .feedback-answer {
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    color: #94a3b8;
-    margin-bottom: 10px;
-  }
-
-  .feedback-answer strong {
-    color: var(--correct);
-    font-family: 'Space Mono', monospace;
-  }
-
-  .feedback-explain {
-    font-size: 14px;
-    color: #94a3b8;
-    line-height: 1.7;
-  }
-
-  /* Actions row */
-  .actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  /* Results screen */
-  #results-screen { display: none; text-align: center; }
-
-  .result-circle {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    border: 4px solid var(--accent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 32px;
-    position: relative;
-    background: radial-gradient(circle, rgba(0,212,255,0.08), transparent);
-  }
-
-  .result-pct {
-    font-size: 42px;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .result-label {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-  }
-
-  .result-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    max-width: 500px;
-    margin: 0 auto 40px;
-  }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-
-  .stat-value {
-    font-size: 28px;
-    font-weight: 800;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .stat-value.green { color: var(--correct); }
-  .stat-value.red { color: var(--wrong); }
-  .stat-value.blue { color: var(--accent); }
-
-  .stat-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  .result-message {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-
-  .result-sub {
-    color: var(--muted);
-    margin-bottom: 40px;
-    font-weight: 400;
-  }
-
-  /* Review section */
-  .review-section { text-align: left; margin-top: 48px; }
-
-  .review-header {
-    font-size: 14px;
-    font-family: 'Space Mono', monospace;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .review-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 12px;
-  }
-
-  .review-item.r-correct { border-left: 3px solid var(--correct); }
-  .review-item.r-wrong { border-left: 3px solid var(--wrong); }
-
-  .review-q { font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-  .review-a { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
-  .review-a .yours { color: var(--wrong); }
-  .review-a .right { color: var(--correct); }
-
-  /* Ordering questions */
-  .order-list { display: grid; gap: 8px; }
-
-  .order-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: grab;
-    user-select: none;
-    font-size: 14px;
-    transition: all 0.15s;
-  }
-
-  .order-item:hover { border-color: var(--accent); }
-  .order-item.dragging { opacity: 0.4; }
-  .order-item.drag-over { border-color: var(--accent); background: rgba(0,212,255,0.1); }
-  .order-item.correct-pos { border-color: var(--correct); background: rgba(16,185,129,0.08); }
-  .order-item.wrong-pos { border-color: var(--wrong); background: rgba(239,68,68,0.08); }
-
-  .drag-handle { color: var(--muted); font-size: 14px; cursor: grab; }
-  .order-num {
-    width: 26px; height: 26px;
-    border-radius: 6px;
-    background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-
-  /* Category selector on home */
-  .filter-row {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
-
-  .filter-btn {
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .filter-btn:hover, .filter-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(0,212,255,0.08);
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    header { padding: 16px 20px; }
-    main { padding: 24px 16px 80px; }
-    .tf-grid { grid-template-columns: 1fr; }
-    .match-wrap { grid-template-columns: 1fr; }
-    h1 { font-size: 32px; }
-    .result-stats { grid-template-columns: 1fr; }
-    .q-text { font-size: 17px; }
-  }
-
-  /* Animation */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .q-card { animation: fadeIn 0.35s ease; }
-
-  /* Tooltip */
-  .hint-text {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 10px;
-    font-style: italic;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Basics Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            background: #eee;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-content {
+            padding: 30px;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .option.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .option-letter {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .truefalse-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .truefalse-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .truefalse-btn:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .truefalse-btn.selected {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .truefalse-btn.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .truefalse-btn.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .matching-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .matching-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .matching-term {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            background: #f8f9ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .matching-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .matching-select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: white;
+        }
+
+        .matching-select:hover {
+            border-color: #667eea;
+        }
+
+        .matching-select.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .matching-select.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .btn-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            color: white;
+        }
+
+        .score-number {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .result-message {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .start-container {
+            text-align: center;
+            padding: 50px 30px;
+        }
+
+        .start-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .start-container p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .matching-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .matching-arrow {
+                text-align: center;
+                transform: rotate(90deg);
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ Networking Basics Quiz</h1>
+            <p>Learn networking terms through everyday examples!</p>
+        </div>
 
-<header>
-  <div class="logo">NW<span>Route</span> Quiz</div>
-  <div class="score-badge">
-    <span>✓ <span id="hdr-correct">0</span></span>
-    <span>✗ <span id="hdr-wrong">0</span></span>
-    <span>Q <span id="hdr-q">0</span>/<span id="hdr-total">0</span></span>
-  </div>
-</header>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
 
-<div class="progress-wrap">
-  <div class="progress-fill" id="progress" style="width:0%"></div>
-</div>
+        <div class="quiz-content">
+            <div class="start-container" id="startContainer">
+                <h2>Welcome!</h2>
+                <p>This quiz will test your knowledge of computer networking<br>
+                using simple, everyday examples.<br><br>
+                <strong>Question Types:</strong><br>
+                • Multiple Choice (MCQ) - Pick the right answer<br>
+                • True or False - Decide if statement is correct<br>
+                • Matching - Connect terms with examples<br><br>
+                <em>Click Start when ready!</em></p>
+                <button class="btn btn-primary" onclick="startQuiz()">Start Quiz ▶️</button>
+            </div>
 
-<main>
+            <div class="question-container" id="questionContainer"></div>
 
-<!-- HOME SCREEN -->
-<div id="home-screen">
-  <div class="tag">Networking Fundamentals</div>
-  <h1>Test Your <em>Network</em><br>Knowledge</h1>
-  <p class="subtitle">Based on your NW Route study material — covering every key concept from LANs to static routing.</p>
-
-  <div class="filter-row">
-    <button class="filter-btn active" onclick="filterTopics('all',this)">All Topics</button>
-    <button class="filter-btn" onclick="filterTopics('basics',this)">Basics</button>
-    <button class="filter-btn" onclick="filterTopics('protocols',this)">Protocols</button>
-    <button class="filter-btn" onclick="filterTopics('routing',this)">Routing</button>
-    <button class="filter-btn" onclick="filterTopics('security',this)">Security</button>
-  </div>
-
-  <div class="topics-grid" id="topics-grid"></div>
-
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-    <button class="btn btn-secondary" onclick="selectAll()">Select All</button>
-    <button class="btn btn-primary" onclick="startQuiz()">Start Quiz →</button>
-  </div>
-</div>
-
-<!-- QUIZ SCREEN -->
-<div id="quiz-screen">
-  <div class="q-header">
-    <div class="q-type-badge" id="q-type-badge">MCQ</div>
-    <div class="q-counter">Question <span id="q-num">1</span> of <span id="q-total">0</span></div>
-  </div>
-
-  <div class="q-card" id="q-card">
-    <div class="q-number" id="q-number">Q1</div>
-    <div class="q-text" id="q-text"></div>
-    <div id="q-body"></div>
-  </div>
-
-  <div class="feedback" id="feedback">
-    <div class="feedback-title">
-      <span class="feedback-icon" id="fb-icon"></span>
-      <span id="fb-title"></span>
+            <div class="results-container" id="resultsContainer">
+                <div class="score-circle">
+                    <span class="score-number" id="scoreNumber">0</span>
+                    <span class="score-label">out of <span id="totalQuestions">0</span></span>
+                </div>
+                <p class="result-message" id="resultMessage"></p>
+                <button class="btn btn-primary" onclick="restartQuiz()">Try Again 🔄</button>
+            </div>
+        </div>
     </div>
-    <div class="feedback-answer" id="fb-answer"></div>
-    <div class="feedback-explain" id="fb-explain"></div>
-  </div>
-
-  <div class="actions">
-    <button class="btn btn-secondary" onclick="skipQuestion()">Skip</button>
-    <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
-    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next Question →</button>
-  </div>
-</div>
-
-<!-- RESULTS SCREEN -->
-<div id="results-screen">
-  <div class="result-circle">
-    <div class="result-pct" id="result-pct">0%</div>
-    <div class="result-label">Score</div>
-  </div>
-  <div class="result-message" id="result-msg"></div>
-  <p class="result-sub" id="result-sub"></p>
-
-  <div class="result-stats">
-    <div class="stat-card">
-      <div class="stat-value green" id="res-correct">0</div>
-      <div class="stat-label">Correct</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value red" id="res-wrong">0</div>
-      <div class="stat-label">Wrong</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value blue" id="res-skip">0</div>
-      <div class="stat-label">Skipped</div>
-    </div>
-  </div>
-
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-    <button class="btn btn-secondary" onclick="goHome()">← Home</button>
-    <button class="btn btn-primary" onclick="restartQuiz()">Try Again</button>
-  </div>
-
-  <div class="review-section">
-    <div class="review-header">Question Review</div>
-    <div id="review-list"></div>
-  </div>
-</div>
-
-</main>
-
-<script>
-// ═══════════════════════════════════════════════════════
-// QUESTION BANK
-// ═══════════════════════════════════════════════════════
-
-const questions = [
-
-  // ── BASICS ────────────────────────────────────────────
-  {
-    id: 1, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'mcq',
-    q: 'What is a computer network?',
-    options: [
-      'A single powerful computer with multiple processors',
-      'A group of devices connected together to share data',
-      'Software that manages internet traffic',
-      'A physical cable connecting two computers'
-    ],
-    answer: 1,
-    explain: 'A network is a group of devices connected together to share data. It enables communication and resource sharing across homes, offices, and the internet.'
-  },
-  {
-    id: 2, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'tf',
-    q: 'A LAN (Local Area Network) is designed to connect devices over large geographical distances such as between countries.',
-    answer: false,
-    explain: 'False! A LAN covers a small area like a building, office, or home. It is a WAN (Wide Area Network) that connects networks over large distances, such as between cities or countries.'
-  },
-  {
-    id: 3, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'fitb',
-    q: 'The protocol ______ (Address Resolution Protocol) is used by a device to find the MAC address of another device when only its IP address is known.',
-    answer: 'ARP',
-    explain: 'ARP (Address Resolution Protocol) maps an IP address to a MAC address on a local network. For example, PC1 sends an ARP broadcast asking "Who has 192.168.1.20?" and PC2 replies with its MAC address.'
-  },
-  {
-    id: 4, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'mcq',
-    q: 'Which device operates at Layer 2 (Data Link Layer) and forwards frames based on MAC addresses?',
-    options: ['Router', 'Hub', 'Switch', 'Modem'],
-    answer: 2,
-    explain: 'A switch operates at Layer 2 (Data Link Layer) and makes forwarding decisions based on MAC addresses. It maintains a MAC address table and sends frames only to the intended recipient port.'
-  },
-  {
-    id: 5, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'match',
-    q: 'Match each network type to its correct description:',
-    pairs: [
-      { left: 'LAN', right: 'Covers a small area like a building or office' },
-      { left: 'WAN', right: 'Connects multiple LANs over large distances' },
-      { left: 'Node', right: 'Any device connected to a network' },
-      { left: 'End Device', right: 'Used by the user to generate and receive data' }
-    ],
-    explain: 'LAN = Local Area Network (small area). WAN = Wide Area Network (large distances, e.g., internet). A Node is any network-connected device. An End Device (like a PC or printer) is used directly by the user.'
-  },
-  {
-    id: 6, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'mcq',
-    q: 'What is the purpose of a Default Gateway?',
-    options: [
-      'To assign IP addresses to devices automatically',
-      'To translate domain names to IP addresses',
-      'To forward packets to devices outside the local network',
-      'To provide wireless connectivity'
-    ],
-    answer: 2,
-    explain: 'The Default Gateway is the router\'s IP address used by devices when they want to communicate outside their local network. For example, PC1 in 192.168.1.0/24 uses 192.168.1.1 as its gateway to reach other networks.'
-  },
-  {
-    id: 7, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'tf',
-    q: 'A MAC address is a logical address that can be changed by network configuration, while an IP address is a physical address burned into the hardware.',
-    answer: false,
-    explain: 'This is reversed! A MAC address is a physical (hardware) address burned into the network interface card. An IP address is a logical address assigned through configuration and can be changed.'
-  },
-  {
-    id: 8, topic: 'basics', topicName: 'Network Fundamentals',
-    type: 'mcq',
-    q: 'ICMP is used by which well-known network utility to test connectivity between two devices?',
-    options: ['FTP', 'Ping', 'Telnet', 'SSH'],
-    answer: 1,
-    explain: 'Ping uses ICMP (Internet Control Message Protocol). It sends ICMP Echo Requests and expects ICMP Echo Replies. A successful reply confirms network connectivity between two devices.'
-  },
-
-  // ── SUBNETTING ────────────────────────────────────────
-  {
-    id: 9, topic: 'basics', topicName: 'Subnetting',
-    type: 'mcq',
-    q: 'How many host addresses are available in a /30 subnet?',
-    options: ['2 usable hosts', '4 total addresses (2 usable)', '6 usable hosts', '8 usable hosts'],
-    answer: 1,
-    explain: '/30 means 32 - 30 = 2 remaining bits. 2² = 4 total addresses. Subtract 2 (network address and broadcast) = 2 usable host addresses. /30 is commonly used for point-to-point links between routers.'
-  },
-  {
-    id: 10, topic: 'basics', topicName: 'Subnetting',
-    type: 'fitb',
-    q: 'A /24 subnet mask in dotted decimal notation is ______.',
-    answer: '255.255.255.0',
-    alternates: ['255.255.255.0'],
-    explain: '/24 means 24 bits are set to 1. In binary: 11111111.11111111.11111111.00000000 = 255.255.255.0 in decimal. This is the most common subnet mask used in home and small office networks.'
-  },
-  {
-    id: 11, topic: 'basics', topicName: 'Subnetting',
-    type: 'mcq',
-    q: 'For a /26 subnet, how many total host addresses exist per network?',
-    options: ['32', '64', '128', '256'],
-    answer: 1,
-    explain: '32 - 26 = 6 remaining bits. 2⁶ = 64 total addresses per network. This gives 62 usable host addresses. The subnet mask is 255.255.255.192. With /26, you get 4 networks per /24 range.'
-  },
-  {
-    id: 12, topic: 'basics', topicName: 'Subnetting',
-    type: 'tf',
-    q: 'The /32 subnet mask (255.255.255.255) is typically assigned to loopback interfaces and represents a single host.',
-    answer: true,
-    explain: 'Correct! /32 assigns a subnet mask of 255.255.255.255, representing a single IP address. It is commonly used for loopback interfaces (e.g., interface Loopback0) on routers.'
-  },
-  {
-    id: 13, topic: 'basics', topicName: 'Subnetting',
-    type: 'mcq',
-    q: 'Which IP address is the network address for 192.168.5.1/29?',
-    options: ['192.168.5.0', '192.168.5.1', '192.168.5.7', '192.168.5.8'],
-    answer: 0,
-    explain: '/29 = 8 hosts per block. The network 192.168.5.0/29 covers: 192.168.5.0 (network), .1 to .6 (usable hosts), .7 (broadcast). So 192.168.5.0 is the network address.'
-  },
-
-  // ── DEVICES ───────────────────────────────────────────
-  {
-    id: 14, topic: 'basics', topicName: 'Network Devices',
-    type: 'mcq',
-    q: 'A router is required when two devices are in:',
-    options: [
-      'The same subnet with the same IP range',
-      'Different subnets or different IP networks',
-      'The same physical building',
-      'Connected to the same switch'
-    ],
-    answer: 1,
-    explain: 'A router connects different IP networks. If two devices are on the same subnet (e.g., both 192.168.1.x), they can communicate directly through a switch. A router is only needed when devices are on different networks.'
-  },
-  {
-    id: 15, topic: 'basics', topicName: 'Network Devices',
-    type: 'match',
-    q: 'Match each device/concept to its Layer in the OSI model:',
-    pairs: [
-      { left: 'Switch (MAC forwarding)', right: 'Layer 2 – Data Link' },
-      { left: 'Router (IP routing)', right: 'Layer 3 – Network' },
-      { left: 'Physical cable', right: 'Layer 1 – Physical' },
-      { left: 'Ping (ICMP)', right: 'Layer 7 – Application' }
-    ],
-    explain: 'Switches work at Layer 2 using MAC addresses. Routers work at Layer 3 using IP addresses. Physical cables operate at Layer 1. ICMP (Ping) is a Layer 7 application-level protocol for testing connectivity.'
-  },
-
-  // ── PROTOCOLS ─────────────────────────────────────────
-  {
-    id: 16, topic: 'protocols', topicName: 'TCP & UDP',
-    type: 'mcq',
-    q: 'What are the three steps of the TCP 3-way handshake in the correct order?',
-    options: [
-      'ACK → SYN → SYN-ACK',
-      'SYN → SYN-ACK → ACK',
-      'SYN-ACK → SYN → ACK',
-      'DATA → SYN → ACK'
-    ],
-    answer: 1,
-    explain: 'The TCP 3-way handshake: (1) SYN – Client initiates connection, (2) SYN-ACK – Server accepts and acknowledges, (3) ACK – Client confirms. After this, data transfer begins with guaranteed reliable delivery.'
-  },
-  {
-    id: 17, topic: 'protocols', topicName: 'TCP & UDP',
-    type: 'tf',
-    q: 'UDP provides reliable, ordered delivery with retransmission of lost packets — making it ideal for file downloads.',
-    answer: false,
-    explain: 'False! UDP is connectionless and does NOT provide reliable delivery, ordering, or retransmission. TCP is preferred for file downloads. UDP is preferred for real-time applications like voice and video calls where speed matters more than reliability.'
-  },
-  {
-    id: 18, topic: 'protocols', topicName: 'TCP & UDP',
-    type: 'mcq',
-    q: 'Which port number range is assigned to Well-Known ports by IANA?',
-    options: ['0 – 1023', '1024 – 49151', '49152 – 65535', '1 – 1024'],
-    answer: 0,
-    explain: 'IANA assigns port ranges as: Well-Known (0–1023), Registered (1024–49151), Ephemeral/Dynamic (49152–65535). Well-Known ports are used by common services like HTTP (80), HTTPS (443), FTP (21), SSH (22).'
-  },
-  {
-    id: 19, topic: 'protocols', topicName: 'TCP & UDP',
-    type: 'match',
-    q: 'Match each feature to whether it belongs to TCP or UDP:',
-    pairs: [
-      { left: 'Reliable delivery with acknowledgements', right: 'TCP' },
-      { left: 'No connection established before sending', right: 'UDP' },
-      { left: 'Retransmission of lost packets', right: 'TCP' },
-      { left: 'Best-effort delivery, lower overhead', right: 'UDP' }
-    ],
-    explain: 'TCP is reliable: it uses acknowledgements, sequencing, and retransmission. UDP is lightweight: no connection setup, no ACKs, no retransmission — ideal for streaming and real-time communications.'
-  },
-  {
-    id: 20, topic: 'protocols', topicName: 'DHCP',
-    type: 'order',
-    q: 'Arrange the DHCP process steps in the correct order (Drag to reorder):',
-    items: ['DHCP DISCOVER – Client asks "Is there a DHCP server?"', 'DHCP OFFER – Server offers an IP address', 'DHCP REQUEST – Client requests the offered IP', 'DHCP ACK – Server confirms the address assignment'],
-    answer: [0, 1, 2, 3],
-    explain: 'DHCP uses DORA: Discover → Offer → Request → ACK. The client broadcasts a DISCOVER (ports 67/68), server responds with OFFER, client sends REQUEST to confirm, server replies with ACK granting the IP.'
-  },
-  {
-    id: 21, topic: 'protocols', topicName: 'DHCP',
-    type: 'tf',
-    q: 'In large enterprise networks, the DHCP server is typically a Windows or Linux server, not the router itself.',
-    answer: true,
-    explain: 'Correct! In small home networks, the router acts as DHCP server. In large enterprise networks, a dedicated Windows or Linux server handles DHCP to support many devices and provide centralized management.'
-  },
-  {
-    id: 22, topic: 'protocols', topicName: 'DNS',
-    type: 'mcq',
-    q: 'What does DNS primarily do in a network?',
-    options: [
-      'Assigns IP addresses to devices automatically',
-      'Translates human-readable domain names to IP addresses',
-      'Monitors network performance',
-      'Encrypts web traffic'
-    ],
-    answer: 1,
-    explain: 'DNS (Domain Name System) translates domain names (e.g., youtube.com) into IP addresses (e.g., 142.250.182.78) that computers use to communicate. Without DNS, users would need to memorize IP addresses.'
-  },
-  {
-    id: 23, topic: 'protocols', topicName: 'DNS',
-    type: 'match',
-    q: 'Match each DNS record type to its purpose:',
-    pairs: [
-      { left: 'A Record', right: 'Maps domain to IPv4 address' },
-      { left: 'AAAA Record', right: 'Maps domain to IPv6 address' },
-      { left: 'MX Record', right: 'Specifies mail server' },
-      { left: 'PTR Record', right: 'Reverse DNS lookup' }
-    ],
-    explain: 'DNS record types: A (IPv4), AAAA (IPv6), MX (mail servers), CNAME (alias/canonical name), PTR (reverse lookup – IP to name). These records are stored on DNS servers worldwide.'
-  },
-  {
-    id: 24, topic: 'protocols', topicName: 'NTP',
-    type: 'mcq',
-    q: 'NTP uses which transport protocol and port number?',
-    options: ['TCP Port 23', 'UDP Port 123', 'TCP Port 80', 'UDP Port 53'],
-    answer: 1,
-    explain: 'NTP (Network Time Protocol) uses UDP port 123 to synchronize clocks. UDP is used because NTP only needs to send small time packets quickly. Accurate time synchronization is critical for log correlation and security.'
-  },
-  {
-    id: 25, topic: 'protocols', topicName: 'NTP',
-    type: 'mcq',
-    q: 'What is a Stratum 0 device in the NTP hierarchy?',
-    options: [
-      'A router synchronized from the internet',
-      'A server synchronized from another server',
-      'A highly accurate clock like GPS or atomic clock',
-      'A PC that has no time synchronization'
-    ],
-    answer: 2,
-    explain: 'Stratum 0 = highly accurate reference clocks (GPS, atomic clocks). Stratum 1 = servers directly connected to Stratum 0. Stratum 2 = servers synchronized from Stratum 1, etc. Lower stratum = higher accuracy.'
-  },
-  {
-    id: 26, topic: 'protocols', topicName: 'SNMP',
-    type: 'mcq',
-    q: 'In SNMP, which message type is sent automatically by a device to the NMS when an event occurs (like an interface going down), without being requested?',
-    options: ['Get', 'Set', 'Trap', 'GetBulk'],
-    answer: 2,
-    explain: 'A Trap is sent unsolicited by a managed device to the NMS (Network Management Station) when an event occurs. Unlike Get/Set which are request-response, Traps are push notifications. Inform is similar but requires acknowledgement.'
-  },
-  {
-    id: 27, topic: 'protocols', topicName: 'SNMP',
-    type: 'fitb',
-    q: 'The database on a managed device that stores all monitorable variables (like interface status, CPU, memory) is called the ______.',
-    answer: 'MIB',
-    alternates: ['Management Information Base'],
-    explain: 'MIB = Management Information Base. It is a structured database on each SNMP-managed device containing variables like interface status, traffic stats, CPU usage. Each variable has a unique OID (Object Identifier).'
-  },
-  {
-    id: 28, topic: 'protocols', topicName: 'FTP & TFTP',
-    type: 'match',
-    q: 'Match each network management protocol to its primary use:',
-    pairs: [
-      { left: 'NTP', right: 'Synchronize device clocks' },
-      { left: 'SNMP', right: 'Monitor and manage network devices' },
-      { left: 'FTP', right: 'Transfer files between systems' },
-      { left: 'TFTP', right: 'Upload IOS images to routers/switches' }
-    ],
-    explain: 'NTP = time sync. SNMP = device monitoring/management. FTP = full-featured file transfer (with authentication). TFTP = Trivial FTP, simpler, used mainly for uploading firmware/IOS images to network devices.'
-  },
-
-  // ── VLAN ──────────────────────────────────────────────
-  {
-    id: 29, topic: 'basics', topicName: 'VLANs',
-    type: 'mcq',
-    q: 'What is the primary purpose of VLANs?',
-    options: [
-      'To increase the physical speed of network links',
-      'To divide one physical switch into multiple logical networks',
-      'To replace routers in large networks',
-      'To assign IP addresses automatically'
-    ],
-    answer: 1,
-    explain: 'VLANs divide one physical switch into multiple logical networks. This reduces broadcast traffic, improves security, and enables logical separation by department (HR, IT, Sales) without needing separate physical switches.'
-  },
-  {
-    id: 30, topic: 'basics', topicName: 'VLANs',
-    type: 'tf',
-    q: 'Devices in different VLANs can communicate directly with each other without requiring a router or Layer 3 device.',
-    answer: false,
-    explain: 'False! VLANs create separate broadcast domains. Traffic between VLANs requires a router or Layer 3 switch (inter-VLAN routing). This is a key security benefit — a guest VLAN cannot directly access a company server VLAN.'
-  },
-  {
-    id: 31, topic: 'basics', topicName: 'VLANs',
-    type: 'mcq',
-    q: 'In the example from the slides, which VLAN ID is assigned to the IT department?',
-    options: ['VLAN 10', 'VLAN 20', 'VLAN 30', 'VLAN 40'],
-    answer: 1,
-    explain: 'From the VLAN design example: VLAN 10 = HR (192.168.10.0), VLAN 20 = IT (192.168.20.0), VLAN 30 = Sales (192.168.30.0). Each VLAN gets its own IP network range for isolation.'
-  },
-
-  // ── ROUTING ───────────────────────────────────────────
-  {
-    id: 32, topic: 'routing', topicName: 'Static Routing',
-    type: 'mcq',
-    q: 'What is the correct syntax for configuring a static route on a Cisco router to reach network 192.168.2.0/24 via next-hop 10.0.12.2?',
-    options: [
-      'route add 192.168.2.0/24 via 10.0.12.2',
-      'ip route 192.168.2.0 255.255.255.0 10.0.12.2',
-      'static route 192.168.2.0 mask 255.255.255.0 next-hop 10.0.12.2',
-      'ip static 192.168.2.0/24 10.0.12.2'
-    ],
-    answer: 1,
-    explain: 'Cisco IOS static route syntax: "ip route [destination_network] [subnet_mask] [next-hop_IP]". Using "ip route 192.168.2.0 255.255.255.0 10.0.12.2" tells the router: to reach 192.168.2.0, forward packets to 10.0.12.2.'
-  },
-  {
-    id: 33, topic: 'routing', topicName: 'Static Routing',
-    type: 'tf',
-    q: 'In static routing, the router uses the network address (e.g., 192.168.2.0) in the routing table, not individual host addresses like 192.168.2.10.',
-    answer: true,
-    explain: 'Correct! Routers think in networks, not individual hosts. A single static route for 192.168.2.0/24 covers ALL hosts in that network (.1 to .254). This is efficient and scalable — one route entry serves an entire LAN.'
-  },
-  {
-    id: 34, topic: 'routing', topicName: 'Static Routing',
-    type: 'mcq',
-    q: 'What is the Administrative Distance (AD) of a static route?',
-    options: ['0', '1', '90', '110'],
-    answer: 1,
-    explain: 'Static routes have AD = 1 (very trusted). Connected routes = 0, EIGRP = 90, OSPF = 110, RIP = 120. Lower AD = more preferred. This means a static route beats OSPF or RIP for the same destination.'
-  },
-  {
-    id: 35, topic: 'routing', topicName: 'Static Routing',
-    type: 'mcq',
-    q: 'What is a Floating Static Route?',
-    options: [
-      'A route that automatically updates when the network changes',
-      'A backup route with a higher AD that activates only when the primary route fails',
-      'A route that uses the exit interface instead of next-hop',
-      'A default route pointing to the internet'
-    ],
-    answer: 1,
-    explain: 'A Floating Static Route is a backup route with a higher AD than the primary. Example: primary route AD=1, backup route AD=200. The backup only becomes active when the primary route disappears from the routing table.'
-  },
-  {
-    id: 36, topic: 'routing', topicName: 'Static Routing',
-    type: 'fitb',
-    q: 'The default route configuration command that sends all unknown traffic to 10.0.12.2 is: ip route ______ ______ 10.0.12.2',
-    answer: '0.0.0.0 0.0.0.0',
-    alternates: ['0.0.0.0'],
-    explain: '"ip route 0.0.0.0 0.0.0.0 10.0.12.2" is the default route (Gateway of Last Resort). It matches any destination not found in the routing table. Essential for internet connectivity and stub networks.'
-  },
-  {
-    id: 37, topic: 'routing', topicName: 'Static Routing',
-    type: 'mcq',
-    q: 'In the 2-router topology (R1–R2), what route must be configured on R1 so PC1 (192.168.1.0/24) can reach PC2 (192.168.2.0/24)?',
-    options: [
-      'ip route 192.168.2.0 255.255.255.0 192.168.1.10',
-      'ip route 192.168.1.0 255.255.255.0 10.0.12.1',
-      'ip route 192.168.2.0 255.255.255.0 10.0.12.2',
-      'ip route 0.0.0.0 0.0.0.0 192.168.1.1'
-    ],
-    answer: 2,
-    explain: 'R1 needs to know how to reach the 192.168.2.0 network. The next-hop is R2\'s IP on the WAN link (10.0.12.2). So: "ip route 192.168.2.0 255.255.255.0 10.0.12.2". R2 also needs a return route back to 192.168.1.0.'
-  },
-  {
-    id: 38, topic: 'routing', topicName: 'Routing Concepts',
-    type: 'mcq',
-    q: 'What does Longest Prefix Match (LPM) mean in routing?',
-    options: [
-      'The router selects the route with the most hops',
-      'The router selects the most specific (longest prefix) matching route',
-      'The router selects the route with the highest administrative distance',
-      'The router selects the oldest route in the table'
-    ],
-    answer: 1,
-    explain: 'LPM: router chooses the most specific route. If routing table has 10.0.0.0/8 and 10.1.1.0/24, and destination is 10.1.1.5, router picks /24 because it\'s more specific. This enables route summarization and traffic engineering.'
-  },
-  {
-    id: 39, topic: 'routing', topicName: 'Routing Concepts',
-    type: 'mcq',
-    q: 'What does a Null0 route do with packets?',
-    options: [
-      'Forwards them to the default gateway',
-      'Holds them in a queue for later delivery',
-      'Discards (drops) them silently',
-      'Broadcasts them to all interfaces'
-    ],
-    answer: 2,
-    explain: 'Null0 is a virtual "black hole" interface — packets routed to Null0 are silently discarded. Used for: (1) preventing routing loops with summarized routes, (2) security filtering, (3) blocking unwanted destinations.'
-  },
-  {
-    id: 40, topic: 'routing', topicName: 'Routing Concepts',
-    type: 'match',
-    q: 'Match each type of static route to its description:',
-    pairs: [
-      { left: 'Default Route', right: 'Sends unknown traffic to a next-hop (0.0.0.0/0)' },
-      { left: 'Null0 Route', right: 'Discards matching packets (black hole)' },
-      { left: 'Floating Static', right: 'Backup route with higher AD value' },
-      { left: 'Next-hop Static', right: 'Specifies the IP of the next router' }
-    ],
-    explain: 'Default route (0.0.0.0/0) = gateway of last resort. Null0 = traffic sink for security/loop prevention. Floating static = backup with high AD (e.g., 200). Next-hop static = standard route pointing to next router IP.'
-  },
-  {
-    id: 41, topic: 'routing', topicName: 'Routing Concepts',
-    type: 'order',
-    q: 'Arrange the router decision-making steps when a packet arrives (in the correct order):',
-    items: [
-      'Packet arrives at router interface',
-      'Check routing table for destination network',
-      'Apply Longest Prefix Match to find best route',
-      'Compare Administrative Distance if multiple routes exist',
-      'Forward packet out the selected interface'
-    ],
-    answer: [0, 1, 2, 3, 4],
-    explain: 'Router decision flow: (1) Receive packet → (2) Look up destination in routing table → (3) Apply LPM for most specific match → (4) Compare AD if multiple sources → (5) Forward packet. This happens in milliseconds for every packet.'
-  },
-  {
-    id: 42, topic: 'routing', topicName: 'Verification',
-    type: 'mcq',
-    q: 'Which command shows the routing table on a Cisco router, including all static routes?',
-    options: [
-      'show ip interface brief',
-      'show mac-address-table',
-      'show ip route',
-      'traceroute 192.168.1.1'
-    ],
-    answer: 2,
-    explain: '"show ip route" displays the complete IP routing table. Static routes appear with "S" prefix: e.g., "S 192.168.5.0/24 [1/0] via 10.0.23.3". Also shows connected routes (C), OSPF (O), RIP (R), etc.'
-  },
-  {
-    id: 43, topic: 'routing', topicName: 'Verification',
-    type: 'match',
-    q: 'Match each troubleshooting command to what it checks:',
-    pairs: [
-      { left: 'show ip route', right: 'Verify routing table entries' },
-      { left: 'show ip interface brief', right: 'Check interface status and IP addresses' },
-      { left: 'tracert / traceroute', right: 'Trace packet path hop by hop' },
-      { left: 'ping', right: 'Test basic connectivity using ICMP' }
-    ],
-    explain: 'Troubleshooting workflow: ipconfig → ping gateway → show ip interface brief → show ip route → traceroute destination. Each step narrows down where the problem exists in the network path.'
-  },
-
-  // ── SECURITY ──────────────────────────────────────────
-  {
-    id: 44, topic: 'security', topicName: 'Access Control Lists',
-    type: 'mcq',
-    q: 'What is the implicit rule at the end of every Cisco ACL?',
-    options: [
-      'Permit any',
-      'Log any',
-      'Deny any (deny all)',
-      'Forward to next interface'
-    ],
-    answer: 2,
-    explain: 'Every Cisco ACL has an implicit "deny any" at the end. If a packet does not match any permit rule, it is dropped. This is why you must always include explicit permit statements for allowed traffic.'
-  },
-  {
-    id: 45, topic: 'security', topicName: 'Access Control Lists',
-    type: 'tf',
-    q: 'An ACL begins filtering traffic as soon as it is created on the router — it does not need to be applied to an interface.',
-    answer: false,
-    explain: 'False! An ACL must be applied to a specific router interface (and direction — "in" or "out") using the "ip access-group" command. Simply creating an ACL has no effect. Example: "interface g0/0 / ip access-group 10 in".'
-  },
-  {
-    id: 46, topic: 'security', topicName: 'Access Control Lists',
-    type: 'mcq',
-    q: 'Where should an Extended ACL be placed for maximum efficiency?',
-    options: [
-      'Near the destination to allow traffic to travel as far as possible',
-      'Near the source to block unwanted traffic as early as possible',
-      'On the core router only',
-      'On every router in the network'
-    ],
-    answer: 1,
-    explain: 'Extended ACLs should be placed near the SOURCE. This blocks unwanted traffic early, saving bandwidth on the rest of the network. Standard ACLs (source-only filtering) should be placed near the DESTINATION.'
-  },
-  {
-    id: 47, topic: 'security', topicName: 'Access Control Lists',
-    type: 'fitb',
-    q: 'The wildcard mask for subnet mask 255.255.255.0 is ______.',
-    answer: '0.0.0.255',
-    explain: 'Wildcard mask = inverse of subnet mask. 255.255.255.0 → flip each bit → 0.0.0.255. In an ACL, "0.0.0.255" means match all hosts in the /24 network. Wildcard 0 = must match, 255 = ignore (any value accepted).'
-  },
-  {
-    id: 48, topic: 'security', topicName: 'Access Control Lists',
-    type: 'mcq',
-    q: 'What does this ACL entry do? "access-list 100 permit tcp 192.168.1.0 0.0.0.255 any eq 80"',
-    options: [
-      'Blocks all HTTP traffic from 192.168.1.0 network',
-      'Allows HTTP (port 80) traffic from the 192.168.1.0/24 network to any destination',
-      'Allows all TCP traffic from any source to 192.168.1.0',
-      'Blocks FTP traffic from the 192.168.1.0 network'
-    ],
-    answer: 1,
-    explain: 'Breaking it down: "permit tcp" = allow TCP, "192.168.1.0 0.0.0.255" = from any host in 192.168.1.0/24, "any" = to any destination, "eq 80" = destination port 80 (HTTP). This is a common extended ACL for web traffic.'
-  },
-
-  // ── SLA & DESIGN ──────────────────────────────────────
-  {
-    id: 49, topic: 'protocols', topicName: 'SLA & Design',
-    type: 'mcq',
-    q: 'A network SLA of 99.99% uptime allows approximately how much downtime per year?',
-    options: [
-      '8 hours 45 minutes',
-      '52 minutes 36 seconds',
-      '5.26 minutes',
-      '31.5 seconds'
-    ],
-    answer: 1,
-    explain: '99.9% = ~8h 46m/year downtime. 99.99% = ~52 min 36 sec/year. 99.999% (five nines) = ~5.26 min/year. 99.9999% (six nines) = ~31.5 sec/year. Enterprise core networks typically target 99.99%.'
-  },
-  {
-    id: 50, topic: 'protocols', topicName: 'SLA & Design',
-    type: 'match',
-    q: 'Match each network design factor to its correct description:',
-    pairs: [
-      { left: 'Redundancy', right: 'Backup paths or devices to survive failures' },
-      { left: 'Scalability', right: 'Ability to grow without full redesign' },
-      { left: 'High Availability', right: 'Network stays operational even if components fail' },
-      { left: 'Manageability', right: 'Easy to monitor, troubleshoot, and control' }
-    ],
-    explain: 'Key network design principles: Redundancy (backup paths), Scalability (easy growth), High Availability (minimal downtime), Performance (fast data transfer), Security (access control), Manageability (monitoring tools like SNMP).'
-  },
-  {
-    id: 51, topic: 'protocols', topicName: 'SLA & Design',
-    type: 'tf',
-    q: 'A MOP (Method of Procedure) is a high-level project plan, while a NIP (Network Implementation Plan) is a detailed step-by-step execution document.',
-    answer: false,
-    explain: 'This is reversed! MOP = detailed step-by-step (CLI commands, rollback steps, pre/post checks). NIP = high-level planning document (design overview, timeline, phases). Analogy: NIP = project blueprint, MOP = construction manual.'
-  },
-  {
-    id: 52, topic: 'protocols', topicName: 'Layer 4',
-    type: 'mcq',
-    q: 'At Layer 4 (Transport), what is used to identify which application is communicating?',
-    options: ['IP Addresses', 'MAC Addresses', 'Port Numbers', 'VLAN IDs'],
-    answer: 2,
-    explain: 'Layer 4 uses PORT NUMBERS to identify applications. Layer 3 uses IP addresses for device-to-device routing. Example: source port 51544, destination port 443 (HTTPS) tells the receiving device which application to deliver data to.'
-  },
-  {
-    id: 53, topic: 'basics', topicName: 'Broadcast vs Unicast',
-    type: 'mcq',
-    q: 'When PC1 sends an ARP request, what type of traffic is it, and why?',
-    options: [
-      'Unicast — because it knows the destination',
-      'Broadcast — because it needs all devices to receive and respond',
-      'Multicast — because it targets a specific group',
-      'Anycast — because the nearest device responds'
-    ],
-    answer: 1,
-    explain: 'ARP requests are broadcasts because PC1 does NOT know the MAC address of the target — that\'s the whole point. The switch forwards the ARP to ALL devices. Only the device with the matching IP responds (unicast reply back to PC1).'
-  },
-];
-
-// ═══════════════════════════════════════════════════════
-// TOPIC METADATA
-// ═══════════════════════════════════════════════════════
-
-const topicsMeta = [
-  { id: 'basics', name: 'Network Basics', icon: '🌐', category: 'basics' },
-  { id: 'protocols', name: 'Protocols & SLA', icon: '📡', category: 'protocols' },
-  { id: 'routing', name: 'Routing', icon: '🔀', category: 'routing' },
-  { id: 'security', name: 'ACLs & Security', icon: '🔒', category: 'security' },
-];
-
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-
-let selectedTopics = new Set(['basics','protocols','routing','security']);
-let quizQuestions = [];
-let currentIndex = 0;
-let score = { correct: 0, wrong: 0, skipped: 0 };
-let answers = [];
-let answered = false;
-
-// Match state
-let matchLeft = null;
-let matchRight = null;
-let matchedPairs = [];
-let matchPairColors = ['#00d4ff','#7c3aed','#10b981','#f59e0b','#ef4444'];
-
-// Order state
-let dragSrc = null;
-
-// ═══════════════════════════════════════════════════════
-// HOME
-// ═══════════════════════════════════════════════════════
-
-function renderTopics() {
-  const grid = document.getElementById('topics-grid');
-  grid.innerHTML = topicsMeta.map(t => {
-    const count = questions.filter(q => q.topic === t.id).length;
-    const sel = selectedTopics.has(t.id) ? 'selected' : '';
-    return `<div class="topic-card ${sel}" onclick="toggleTopic('${t.id}',this)">
-      <div class="topic-icon">${t.icon}</div>
-      <div class="topic-name">${t.name}</div>
-      <div class="topic-count">${count} questions</div>
-      <div class="topic-check">✓</div>
-    </div>`;
-  }).join('');
-}
-
-function toggleTopic(id, el) {
-  if (selectedTopics.has(id)) selectedTopics.delete(id);
-  else selectedTopics.add(id);
-  el.classList.toggle('selected');
-}
-
-function filterTopics(cat, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (cat === 'all') selectedTopics = new Set(['basics','protocols','routing','security']);
-  else { selectedTopics.clear(); selectedTopics.add(cat); }
-  renderTopics();
-}
-
-function selectAll() {
-  selectedTopics = new Set(['basics','protocols','routing','security']);
-  renderTopics();
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-function startQuiz() {
-  const pool = questions.filter(q => selectedTopics.has(q.topic));
-  if (pool.length === 0) { alert('Please select at least one topic!'); return; }
-  quizQuestions = shuffle(pool);
-  currentIndex = 0;
-  score = { correct: 0, wrong: 0, skipped: 0 };
-  answers = new Array(quizQuestions.length).fill(null);
-
-  document.getElementById('home-screen').style.display = 'none';
-  document.getElementById('quiz-screen').style.display = 'block';
-  document.getElementById('q-total').textContent = quizQuestions.length;
-  document.getElementById('hdr-total').textContent = quizQuestions.length;
-
-  renderQuestion();
-}
-
-// ═══════════════════════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════════════════════
-
-function renderQuestion() {
-  const q = quizQuestions[currentIndex];
-  answered = false;
-
-  // Reset UI
-  document.getElementById('feedback').style.display = 'none';
-  document.getElementById('submit-btn').style.display = 'inline-flex';
-  document.getElementById('next-btn').style.display = 'none';
-
-  // Header
-  document.getElementById('q-num').textContent = currentIndex + 1;
-  document.getElementById('q-number').textContent = `Q${currentIndex + 1}`;
-  document.getElementById('q-text').textContent = q.q;
-
-  // Type badge
-  const badge = document.getElementById('q-type-badge');
-  const typeMap = {
-    mcq: ['MCQ', 'badge-mcq'],
-    tf: ['True / False', 'badge-tf'],
-    fitb: ['Fill in the Blank', 'badge-fitb'],
-    match: ['Matching', 'badge-match'],
-    order: ['Ordering', 'badge-order']
-  };
-  badge.className = 'q-type-badge ' + typeMap[q.type][1];
-  badge.textContent = typeMap[q.type][0];
-
-  // Progress
-  const pct = ((currentIndex) / quizQuestions.length) * 100;
-  document.getElementById('progress').style.width = pct + '%';
-
-  // Render body
-  const body = document.getElementById('q-body');
-  if (q.type === 'mcq') body.innerHTML = renderMCQ(q);
-  else if (q.type === 'tf') body.innerHTML = renderTF(q);
-  else if (q.type === 'fitb') body.innerHTML = renderFITB(q);
-  else if (q.type === 'match') { body.innerHTML = renderMatch(q); initMatch(q); }
-  else if (q.type === 'order') { body.innerHTML = renderOrder(q); initOrder(); }
-
-  // Scroll top
-  window.scrollTo(0, 0);
-}
-
-function renderMCQ(q) {
-  return `<div class="options-grid">` +
-    q.options.map((opt, i) =>
-      `<button class="option" onclick="selectMCQ(this,${i})">
-        <span class="opt-label">${'ABCD'[i]}</span>
-        <span>${opt}</span>
-      </button>`
-    ).join('') +
-  `</div>`;
-}
-
-function selectMCQ(el, i) {
-  if (answered) return;
-  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  el.dataset.idx = i;
-}
-
-function renderTF(q) {
-  return `<div class="tf-grid">
-    <button class="tf-btn" onclick="selectTF(this,'true')">✓ True</button>
-    <button class="tf-btn" onclick="selectTF(this,'false')">✗ False</button>
-  </div>`;
-}
-
-function selectTF(el, val) {
-  if (answered) return;
-  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  el.dataset.val = val;
-}
-
-function renderFITB(q) {
-  return `<div class="fitb-wrap">
-    <input class="fitb-input" type="text" id="fitb-inp" placeholder="Type your answer here…" autocomplete="off" />
-    <p class="hint-text">💡 Type the exact term or abbreviation</p>
-  </div>`;
-}
-
-function renderMatch(q) {
-  const rights = shuffle(q.pairs.map((p, i) => ({ text: p.right, idx: i })));
-  return `<div class="match-wrap">
-    <div>
-      <div class="match-col-label">Column A</div>
-      ${q.pairs.map((p, i) => `<div class="match-item" id="ml-${i}" onclick="matchClickLeft(${i})">${p.left}</div>`).join('')}
-    </div>
-    <div>
-      <div class="match-col-label">Column B</div>
-      ${rights.map((r, i) => `<div class="match-item" id="mr-${r.idx}" data-ridx="${r.idx}" onclick="matchClickRight(${r.idx})">${r.text}</div>`).join('')}
-    </div>
-  </div>
-  <p class="hint-text">👆 Click an item from Column A, then click its match in Column B</p>`;
-}
-
-function initMatch(q) {
-  matchLeft = null; matchRight = null; matchedPairs = [];
-}
-
-function matchClickLeft(idx) {
-  if (answered) return;
-  document.querySelectorAll('[id^="ml-"]').forEach(e => e.classList.remove('selected'));
-  const el = document.getElementById('ml-' + idx);
-  if (matchedPairs.find(p => p.left === idx)) return;
-  matchLeft = idx;
-  el.classList.add('selected');
-  tryMatch();
-}
-
-function matchClickRight(idx) {
-  if (answered) return;
-  document.querySelectorAll('[id^="mr-"]').forEach(e => e.classList.remove('selected'));
-  const el = document.getElementById('mr-' + idx);
-  if (matchedPairs.find(p => p.right === idx)) return;
-  matchRight = idx;
-  el.classList.add('selected');
-  tryMatch();
-}
-
-function tryMatch() {
-  if (matchLeft === null || matchRight === null) return;
-  const color = matchPairColors[matchedPairs.length % matchPairColors.length];
-  const lEl = document.getElementById('ml-' + matchLeft);
-  const rEl = document.getElementById('mr-' + matchRight);
-  lEl.style.borderColor = color;
-  rEl.style.borderColor = color;
-  lEl.classList.remove('selected'); rEl.classList.remove('selected');
-  matchedPairs.push({ left: matchLeft, right: matchRight });
-  matchLeft = null; matchRight = null;
-}
-
-function renderOrder(q) {
-  return `<div class="order-list" id="order-list">
-    ${q.items.map((item, i) =>
-      `<div class="order-item" draggable="true" data-pos="${i}">
-        <span class="drag-handle">⠿</span>
-        <span class="order-num">${i + 1}</span>
-        <span>${item}</span>
-      </div>`
-    ).join('')}
-  </div>
-  <p class="hint-text">⬆⬇ Drag items to reorder them</p>`;
-}
-
-function initOrder() {
-  const list = document.getElementById('order-list');
-  let items = [...list.querySelectorAll('.order-item')];
-
-  items.forEach(item => {
-    item.addEventListener('dragstart', e => {
-      dragSrc = item;
-      item.classList.add('dragging');
-    });
-    item.addEventListener('dragend', () => item.classList.remove('dragging'));
-    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
-    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
-    item.addEventListener('drop', e => {
-      e.preventDefault();
-      item.classList.remove('drag-over');
-      if (dragSrc && dragSrc !== item) {
-        const allItems = [...list.querySelectorAll('.order-item')];
-        const srcIdx = allItems.indexOf(dragSrc);
-        const dstIdx = allItems.indexOf(item);
-        if (srcIdx < dstIdx) item.after(dragSrc);
-        else item.before(dragSrc);
-        // update numbers
-        [...list.querySelectorAll('.order-item')].forEach((el, i) => {
-          el.querySelector('.order-num').textContent = i + 1;
-        });
-      }
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// SUBMIT / EVALUATE
-// ═══════════════════════════════════════════════════════
-
-function submitAnswer() {
-  if (answered) return;
-  const q = quizQuestions[currentIndex];
-  let userAnswer, isCorrect;
-
-  if (q.type === 'mcq') {
-    const sel = document.querySelector('.option.selected');
-    if (!sel) { showHint('Please select an answer!'); return; }
-    userAnswer = parseInt(sel.dataset.idx);
-    isCorrect = userAnswer === q.answer;
-    revealMCQ(q, userAnswer, isCorrect);
-
-  } else if (q.type === 'tf') {
-    const sel = document.querySelector('.tf-btn.selected');
-    if (!sel) { showHint('Please select True or False!'); return; }
-    userAnswer = sel.dataset.val === 'true';
-    isCorrect = userAnswer === q.answer;
-    revealTF(q, userAnswer, isCorrect);
-
-  } else if (q.type === 'fitb') {
-    const inp = document.getElementById('fitb-inp');
-    userAnswer = inp.value.trim();
-    if (!userAnswer) { showHint('Please type an answer!'); return; }
-    const check = userAnswer.toLowerCase().replace(/\s+/g,'');
-    const correct = q.answer.toLowerCase().replace(/\s+/g,'');
-    const alts = (q.alternates || []).map(a => a.toLowerCase().replace(/\s+/g,''));
-    isCorrect = check === correct || alts.includes(check);
-    inp.classList.add(isCorrect ? 'correct' : 'wrong');
-
-  } else if (q.type === 'match') {
-    const q2 = quizQuestions[currentIndex];
-    if (matchedPairs.length < q2.pairs.length) { showHint(`Match all ${q2.pairs.length} pairs!`); return; }
-    let allCorrect = true;
-    matchedPairs.forEach(pair => {
-      const correct = pair.left === pair.right;
-      if (!correct) allCorrect = false;
-      document.getElementById('ml-' + pair.left).classList.add(correct ? 'matched' : 'wrong-match');
-      document.getElementById('mr-' + pair.right).classList.add(correct ? 'matched' : 'wrong-match');
-    });
-    isCorrect = allCorrect;
-    userAnswer = 'matched';
-
-    // Show correct connections
-    if (!isCorrect) {
-      q2.pairs.forEach((p, i) => {
-        const lEl = document.getElementById('ml-' + i);
-        const rEl = document.getElementById('mr-' + i);
-        lEl.style.borderColor = '#10b981';
-        rEl.style.borderColor = '#10b981';
-      });
-    }
-
-  } else if (q.type === 'order') {
-    const list = document.getElementById('order-list');
-    const items = [...list.querySelectorAll('.order-item')];
-    const userOrder = items.map(el => parseInt(el.dataset.pos));
-    isCorrect = JSON.stringify(userOrder) === JSON.stringify(q.answer);
-    userAnswer = userOrder;
-    items.forEach((el, i) => {
-      const correct = userOrder[i] === q.answer[i];
-      el.classList.add(correct ? 'correct-pos' : 'wrong-pos');
-    });
-    // disable dragging
-    items.forEach(el => el.setAttribute('draggable', 'false'));
-  }
-
-  answered = true;
-  if (isCorrect) score.correct++; else score.wrong++;
-  answers[currentIndex] = { q, userAnswer, isCorrect };
-
-  // Update header
-  document.getElementById('hdr-correct').textContent = score.correct;
-  document.getElementById('hdr-wrong').textContent = score.wrong;
-  document.getElementById('hdr-q').textContent = currentIndex + 1;
-
-  // Disable inputs
-  document.querySelectorAll('.option, .tf-btn, #fitb-inp').forEach(el => {
-    el.classList.add('disabled');
-    el.style.pointerEvents = 'none';
-  });
-
-  // Show feedback
-  showFeedback(q, isCorrect, q.type === 'fitb' ? userAnswer : null);
-
-  document.getElementById('submit-btn').style.display = 'none';
-  document.getElementById('next-btn').style.display = 'inline-flex';
-}
-
-function revealMCQ(q, userAnswer, isCorrect) {
-  document.querySelectorAll('.option').forEach((el, i) => {
-    if (i === q.answer) el.classList.add('correct');
-    else if (i === userAnswer && !isCorrect) el.classList.add('wrong');
-  });
-}
-
-function revealTF(q, userAnswer, isCorrect) {
-  document.querySelectorAll('.tf-btn').forEach(el => {
-    const val = el.dataset.val === 'true';
-    if (val === q.answer) el.classList.add('correct');
-    else if (val === userAnswer && !isCorrect) el.classList.add('wrong');
-  });
-}
-
-function showFeedback(q, isCorrect, typed) {
-  const fb = document.getElementById('feedback');
-  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
-  document.getElementById('fb-icon').textContent = isCorrect ? '✓' : '✗';
-  document.getElementById('fb-title').textContent = isCorrect ? 'Correct!' : 'Not quite right';
-
-  let answerText = '';
-  if (q.type === 'mcq') answerText = `Correct answer: ${q.options[q.answer]}`;
-  else if (q.type === 'tf') answerText = `Correct answer: ${q.answer ? 'True' : 'False'}`;
-  else if (q.type === 'fitb') answerText = `Correct answer: ${q.answer}${typed && !isCorrect ? ` (You wrote: ${typed})` : ''}`;
-  else if (q.type === 'match') answerText = isCorrect ? 'All pairs matched correctly!' : 'Check the green-highlighted correct pairs above.';
-  else if (q.type === 'order') answerText = isCorrect ? 'Perfect order!' : 'Correct order shown above (green = correct position).';
-
-  document.getElementById('fb-answer').innerHTML = `<strong>→</strong> ${answerText}`;
-  document.getElementById('fb-explain').textContent = q.explain;
-  fb.style.display = 'block';
-}
-
-function showHint(msg) {
-  const btn = document.getElementById('submit-btn');
-  btn.textContent = msg;
-  btn.style.background = '#ef4444';
-  setTimeout(() => { btn.textContent = 'Submit Answer'; btn.style.background = ''; }, 2000);
-}
-
-function skipQuestion() {
-  if (answered) { nextQuestion(); return; }
-  const q = quizQuestions[currentIndex];
-  score.skipped++;
-  answers[currentIndex] = { q, userAnswer: null, isCorrect: false, skipped: true };
-  document.getElementById('hdr-q').textContent = currentIndex + 1;
-
-  // Show correct answer on skip
-  answered = true;
-  showFeedback(q, false, null);
-  document.getElementById('feedback').querySelector('#fb-title').textContent = 'Skipped — Here\'s the answer:';
-  document.getElementById('submit-btn').style.display = 'none';
-  document.getElementById('next-btn').style.display = 'inline-flex';
-}
-
-function nextQuestion() {
-  currentIndex++;
-  if (currentIndex >= quizQuestions.length) {
-    showResults();
-  } else {
-    renderQuestion();
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// RESULTS
-// ═══════════════════════════════════════════════════════
-
-function showResults() {
-  document.getElementById('quiz-screen').style.display = 'none';
-  document.getElementById('results-screen').style.display = 'block';
-  document.getElementById('progress').style.width = '100%';
-
-  const total = quizQuestions.length;
-  const pct = Math.round((score.correct / total) * 100);
-  document.getElementById('result-pct').textContent = pct + '%';
-  document.getElementById('res-correct').textContent = score.correct;
-  document.getElementById('res-wrong').textContent = score.wrong;
-  document.getElementById('res-skip').textContent = score.skipped;
-
-  let msg, sub;
-  if (pct >= 90) { msg = '🏆 Outstanding!'; sub = 'You have mastered networking fundamentals!'; }
-  else if (pct >= 75) { msg = '🎯 Great Work!'; sub = 'Strong understanding — review a few weak spots.'; }
-  else if (pct >= 60) { msg = '📚 Good Effort'; sub = 'Solid base — revisit routing and protocols.'; }
-  else { msg = '💪 Keep Practicing!'; sub = 'Review the slides and try again — you\'ve got this!'; }
-
-  document.getElementById('result-msg').textContent = msg;
-  document.getElementById('result-sub').textContent = sub;
-
-  // Review list
-  const list = document.getElementById('review-list');
-  list.innerHTML = answers.map((ans, i) => {
-    if (!ans) return '';
-    const icon = ans.skipped ? '⏭' : ans.isCorrect ? '✓' : '✗';
-    const cls = ans.isCorrect ? 'r-correct' : 'r-wrong';
-    let detail = '';
-    if (!ans.isCorrect && !ans.skipped) {
-      if (ans.q.type === 'mcq') detail = `<div class="review-a">You chose: <span class="yours">${ans.q.options[ans.userAnswer] || '—'}</span> · Correct: <span class="right">${ans.q.options[ans.q.answer]}</span></div>`;
-      else if (ans.q.type === 'tf') detail = `<div class="review-a">You chose: <span class="yours">${ans.userAnswer !== null ? (ans.userAnswer ? 'True':'False') : '—'}</span> · Correct: <span class="right">${ans.q.answer ? 'True':'False'}</span></div>`;
-      else if (ans.q.type === 'fitb') detail = `<div class="review-a">Correct answer: <span class="right">${ans.q.answer}</span></div>`;
-    }
-    return `<div class="review-item ${cls}">
-      <div class="review-q">${icon} ${ans.q.q.substring(0, 120)}${ans.q.q.length > 120 ? '…' : ''}</div>
-      ${detail}
-    </div>`;
-  }).join('');
-
-  window.scrollTo(0, 0);
-}
-
-function goHome() {
-  document.getElementById('results-screen').style.display = 'none';
-  document.getElementById('home-screen').style.display = 'block';
-  document.getElementById('progress').style.width = '0%';
-  document.getElementById('hdr-correct').textContent = '0';
-  document.getElementById('hdr-wrong').textContent = '0';
-  document.getElementById('hdr-q').textContent = '0';
-}
-
-function restartQuiz() {
-  document.getElementById('results-screen').style.display = 'none';
-  startQuiz();
-}
-
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-
-renderTopics();
-</script>
+
+    <script>
+        const questions = [
+            {
+                "id": 1,
+                "type": "mcq",
+                "question": "What is a Client in computer networking?",
+                "options": [
+                    "A device that provides service",
+                    "A device that requests service",
+                    "A type of cable",
+                    "A security guard"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Just like a customer ordering food at a restaurant, a client is a device that requests service from a server."
+            },
+            {
+                "id": 2,
+                "type": "mcq",
+                "question": "What is a Server?",
+                "options": [
+                    "A device that requests service",
+                    "A device that provides service",
+                    "A wireless signal",
+                    "A type of website"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Just like a restaurant kitchen prepares food for customers, a server provides service to clients."
+            },
+            {
+                "id": 3,
+                "type": "truefalse",
+                "question": "When you open a website on your laptop, your laptop acts as a client.",
+                "correctAnswer": true,
+                "explanation": "Yes! Your laptop is requesting the website content, so it acts as a client."
+            },
+            {
+                "id": 4,
+                "type": "mcq",
+                "question": "What is a Router like in daily life?",
+                "options": [
+                    "A delivery truck",
+                    "A traffic police officer directing vehicles",
+                    "A telephone operator",
+                    "A security guard at a building"
+                ],
+                "correctAnswer": 1,
+                "explanation": "A router directs data to the correct destination, just like a traffic police officer directs vehicles."
+            },
+            {
+                "id": 5,
+                "type": "truefalse",
+                "question": "A router is the same thing as a WiFi device at home.",
+                "correctAnswer": true,
+                "explanation": "Yes! The WiFi device you have at home is actually a router that connects your devices to the internet."
+            },
+            {
+                "id": 6,
+                "type": "mcq",
+                "question": "What is an IP address compared to in daily life?",
+                "options": [
+                    "A phone charger",
+                    "A house address",
+                    "A door lock",
+                    "A light switch"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Just like a house address helps courier reach the right house, an IP address helps data reach the right device."
+            },
+            {
+                "id": 7,
+                "type": "truefalse",
+                "question": "Every device connected to a network needs its own IP address.",
+                "correctAnswer": true,
+                "explanation": "Yes! Just like every house has a unique address, every device needs a unique IP address."
+            },
+            {
+                "id": 8,
+                "type": "mcq",
+                "question": "What does DNS do?",
+                "options": [
+                    "Delivers emails",
+                    "Converts website names to IP addresses",
+                    "Blocks websites",
+                    "Speeds up internet"
+                ],
+                "correctAnswer": 1,
+                "explanation": "DNS is like your phone's contact list - you remember the name (google.com), and DNS finds the number (IP address)."
+            },
+            {
+                "id": 9,
+                "type": "truefalse",
+                "question": "When you type 'google.com', your computer first asks DNS to find the IP address.",
+                "correctAnswer": true,
+                "explanation": "Correct! DNS acts like a phone book, converting the website name to an IP address your computer can understand."
+            },
+            {
+                "id": 10,
+                "type": "mcq",
+                "question": "What is DHCP compared to in daily life?",
+                "options": [
+                    "Hotel check-in that automatically assigns room numbers",
+                    "A manual address book",
+                    "A security guard checking IDs",
+                    "A telephone operator"
+                ],
+                "correctAnswer": 0,
+                "explanation": "DHCP automatically gives IP addresses to devices, just like a hotel automatically assigns room numbers to guests."
+            },
+            {
+                "id": 11,
+                "type": "truefalse",
+                "question": "Without DHCP, you would need to manually type an IP address for each device.",
+                "correctAnswer": true,
+                "explanation": "Exactly! Without DHCP, it's like having to manually pick a room number every time you stay at a hotel."
+            },
+            {
+                "id": 12,
+                "type": "mcq",
+                "question": "What is a Network Cable used for?",
+                "options": [
+                    "Charging phones",
+                    "Connecting network devices so data can travel",
+                    "Watching TV",
+                    "Printing documents"
+                ],
+                "correctAnswer": 1,
+                "explanation": "A network cable is like a water pipe - it carries data between devices just like a pipe carries water between houses."
+            },
+            {
+                "id": 13,
+                "type": "truefalse",
+                "question": "A straight-through cable is used to connect two different types of devices.",
+                "correctAnswer": true,
+                "explanation": "Correct! Straight-through cables connect different devices, like a computer to a switch."
+            },
+            {
+                "id": 14,
+                "type": "mcq",
+                "question": "What is a Firewall compared to in daily life?",
+                "options": [
+                    "Airport security system",
+                    "A door handle",
+                    "A telephone",
+                    "A light bulb"
+                ],
+                "correctAnswer": 0,
+                "explanation": "A firewall checks all traffic coming in and out, like airport security checking passengers and luggage."
+            },
+            {
+                "id": 15,
+                "type": "truefalse",
+                "question": "A firewall can block dangerous traffic from entering your network.",
+                "correctAnswer": true,
+                "explanation": "Yes! Just like airport security blocks prohibited items, a firewall blocks harmful traffic."
+            },
+            {
+                "id": 16,
+                "type": "mcq",
+                "question": "What does the ping command do?",
+                "options": [
+                    "Sends emails",
+                    "Tests if a device is reachable",
+                    "Creates a folder",
+                    "Opens a website"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Ping is like making a phone call to check if someone is available - it tests connectivity."
+            },
+            {
+                "id": 17,
+                "type": "truefalse",
+                "question": "Ping uses a protocol called ICMP to test connectivity.",
+                "correctAnswer": true,
+                "explanation": "Correct! ICMP (Internet Control Message Protocol) is the protocol used by ping to test connectivity."
+            },
+            {
+                "id": 18,
+                "type": "mcq",
+                "question": "What is Latency in simple terms?",
+                "options": [
+                    "Internet speed",
+                    "Delay in communication",
+                    "Amount of data",
+                    "Number of devices"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Latency is the delay in communication - like the delay you sometimes hear in a phone call."
+            },
+            {
+                "id": 19,
+                "type": "truefalse",
+                "question": "Higher latency means longer delay in receiving data.",
+                "correctAnswer": true,
+                "explanation": "Yes! Latency is measured in milliseconds (ms) - higher means more delay."
+            },
+            {
+                "id": 20,
+                "type": "mcq",
+                "question": "What is a VLAN in simple terms?",
+                "options": [
+                    "A type of virus",
+                    "Logically separates networks inside the same device",
+                    "A wireless signal",
+                    "A type of cable"
+                ],
+                "correctAnswer": 1,
+                "explanation": "VLAN is like dividing an office building into different departments - they're physically in the same building but logically separated."
+            },
+            {
+                "id": 21,
+                "type": "truefalse",
+                "question": "An Access Port on a switch carries multiple VLANs.",
+                "correctAnswer": false,
+                "explanation": "No! An Access Port belongs to a single VLAN (like one department). A Trunk Port carries multiple VLANs."
+            },
+            {
+                "id": 22,
+                "type": "mcq",
+                "question": "What is the Default Gateway?",
+                "options": [
+                    "The main exit gate of your network",
+                    "A special website",
+                    "A type of password",
+                    "A wireless router name"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The Default Gateway is like the main exit gate of an apartment - all outside traffic goes through it."
+            },
+            {
+                "id": 23,
+                "type": "truefalse",
+                "question": "The Default Gateway is usually the router's IP address in your home network.",
+                "correctAnswer": true,
+                "explanation": "Yes! In home networks, your router's IP address (often 192.168.1.1) is the default gateway."
+            },
+            {
+                "id": 24,
+                "type": "mcq",
+                "question": "What is MAC Address compared to in daily life?",
+                "options": [
+                    "A vehicle chassis number given by manufacturer",
+                    "A house address",
+                    "A phone number",
+                    "A door lock code"
+                ],
+                "correctAnswer": 0,
+                "explanation": "A MAC address is like a vehicle chassis number - it's a unique hardware address given by the manufacturer."
+            },
+            {
+                "id": 25,
+                "type": "truefalse",
+                "question": "MAC addresses are used to find the exact hardware device on a network.",
+                "correctAnswer": true,
+                "explanation": "Correct! While IP addresses are logical, MAC addresses are physical unique addresses built into network devices."
+            },
+            {
+                "id": 26,
+                "type": "mcq",
+                "question": "What does ARP do?",
+                "options": [
+                    "Sends emails",
+                    "Finds MAC address using IP address",
+                    "Blocks websites",
+                    "Creates passwords"
+                ],
+                "correctAnswer": 1,
+                "explanation": "ARP is like finding someone's phone number using their name - it finds the MAC address when you know the IP."
+            },
+            {
+                "id": 27,
+                "type": "truefalse",
+                "question": "Broadcast means sending a message to ALL devices in the network.",
+                "correctAnswer": true,
+                "explanation": "Yes! Broadcast is like a teacher making an announcement to the entire class - one sender to everyone."
+            },
+            {
+                "id": 28,
+                "type": "mcq",
+                "question": "What is Unicast?",
+                "options": [
+                    "One sender to all devices",
+                    "One sender to one receiver",
+                    "One sender to a selected group",
+                    "No communication"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Unicast is like a phone call - one person talking to one specific person."
+            },
+            {
+                "id": 29,
+                "type": "truefalse",
+                "question": "Multicast is like sending an invitation to only specific people in a group.",
+                "correctAnswer": true,
+                "explanation": "Correct! Multicast is like an online meeting - one sender to a selected group of participants."
+            },
+            {
+                "id": 30,
+                "type": "mcq",
+                "question": "What is the main difference between Telnet and SSH?",
+                "options": [
+                    "SSH is faster",
+                    "SSH is more secure with encryption",
+                    "Telnet is newer",
+                    "There is no difference"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SSH is like having a conversation in a locked room - it's secure. Telnet is like talking loudly in public - anyone can hear your password!"
+            },
+            {
+                "id": 31,
+                "type": "truefalse",
+                "question": "SSH encrypts your password when logging in remotely, making it secure.",
+                "correctAnswer": true,
+                "explanation": "Yes! That's the key advantage of SSH over Telnet - your credentials are encrypted."
+            },
+            {
+                "id": 32,
+                "type": "mcq",
+                "question": "What is Console cable used for?",
+                "options": [
+                    "Connecting to the internet wirelessly",
+                    "Direct cable connection to configure a network device",
+                    "Charging laptops",
+                    "Connecting speakers"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Console cable is like a repair technician directly connecting to a machine - it's for direct device configuration."
+            },
+            {
+                "id": 33,
+                "type": "truefalse",
+                "question": "Console connection doesn't require internet - it connects directly to the device.",
+                "correctAnswer": true,
+                "explanation": "Correct! Console cable connects your laptop directly to the router - no network needed."
+            },
+            {
+                "id": 34,
+                "type": "mcq",
+                "question": "What is CLI in networking?",
+                "options": [
+                    "A graphical interface with buttons",
+                    "Text-based method to configure devices by typing commands",
+                    "A type of cable",
+                    "A wireless signal"
+                ],
+                "correctAnswer": 1,
+                "explanation": "CLI (Command Line Interface) is like typing a message instead of using voice - you type commands to control devices."
+            },
+            {
+                "id": 35,
+                "type": "truefalse",
+                "question": "CLI commands like 'show ip route' display the routing table of a router.",
+                "correctAnswer": true,
+                "explanation": "Yes! 'show ip route' is a CLI command that shows all known routes in the router."
+            },
+            {
+                "id": 36,
+                "type": "mcq",
+                "question": "What is FTP used for?",
+                "options": [
+                    "Sending text messages",
+                    "Transferring files between computers",
+                    "Watching videos",
+                    "Playing games"
+                ],
+                "correctAnswer": 1,
+                "explanation": "FTP (File Transfer Protocol) is like sending files via courier - it's used to transfer files to/from servers."
+            },
+            {
+                "id": 37,
+                "type": "truefalse",
+                "question": "FTP is commonly used to upload website files to a web server.",
+                "correctAnswer": true,
+                "explanation": "Correct! Web developers use FTP to upload their website files to hosting servers."
+            },
+            {
+                "id": 38,
+                "type": "mcq",
+                "question": "What is SNMP used for?",
+                "options": [
+                    "Transferring files",
+                    "Monitoring network devices",
+                    "Sending emails",
+                    "Blocking websites"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SNMP (Simple Network Management Protocol) is like a CCTV control room - it monitors network devices."
+            },
+            {
+                "id": 39,
+                "type": "truefalse",
+                "question": "NTP (Network Time Protocol) synchronizes time across all network devices.",
+                "correctAnswer": true,
+                "explanation": "Yes! NTP makes sure all routers and devices show the same time, like synchronized clocks."
+            },
+            {
+                "id": 40,
+                "type": "mcq",
+                "question": "What is the difference between TCP and UDP?",
+                "options": [
+                    "They are the same",
+                    "TCP is reliable but slower, UDP is faster but less reliable",
+                    "TCP is wireless",
+                    "UDP is more secure"
+                ],
+                "correctAnswer": 1,
+                "explanation": "TCP is like registered post (reliable but slower), UDP is like normal post (faster but less reliable)."
+            },
+            {
+                "id": 41,
+                "type": "truefalse",
+                "question": "Streaming videos uses UDP because speed matters more than perfect delivery.",
+                "correctAnswer": true,
+                "explanation": "Correct! Video streaming uses UDP - if a frame is missed, it just moves on rather than waiting for retransmission."
+            },
+            {
+                "id": 42,
+                "type": "mcq",
+                "question": "What is Packet Loss?",
+                "options": [
+                    "Data lost during transmission",
+                    "Password not working",
+                    "Website not loading",
+                    "Internet too fast"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Packet loss is like voice breaking during a phone call - some data doesn't reach the destination."
+            },
+            {
+                "id": 43,
+                "type": "truefalse",
+                "question": "Jitter is the variation in delay during communication.",
+                "correctAnswer": true,
+                "explanation": "Yes! Jitter is like disturbance in a video call - sometimes fast, sometimes slow delays."
+            },
+            {
+                "id": 44,
+                "type": "mcq",
+                "question": "What is Inter-VLAN Routing?",
+                "options": [
+                    "Connecting different VLANs so they can communicate",
+                    "Blocking all traffic",
+                    "Creating a new VLAN",
+                    "Deleting a network"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Inter-VLAN routing is like having a post office connect different departments - it allows different VLANs to communicate."
+            },
+            {
+                "id": 45,
+                "type": "truefalse",
+                "question": "Devices in different VLANs cannot communicate without Inter-VLAN routing.",
+                "correctAnswer": true,
+                "explanation": "Correct! Each VLAN is like a separate network - they need a router to communicate with each other."
+            },
+            {
+                "id": 46,
+                "type": "matching",
+                "question": "Match the networking term with its daily life example:",
+                "pairs": [
+                    { "term": "Client", "match": "Customer ordering food" },
+                    { "term": "Server", "match": "Restaurant kitchen preparing food" },
+                    { "term": "Router", "match": "Traffic police officer" },
+                    { "term": "IP Address", "match": "House address" },
+                    { "term": "DNS", "match": "Mobile contact list" },
+                    { "term": "DHCP", "match": "Hotel assigning room numbers" },
+                    { "term": "Firewall", "match": "Airport security" },
+                    { "term": "Packet", "match": "Courier package" }
+                ]
+            },
+            {
+                "id": 47,
+                "type": "matching",
+                "question": "Match the term with its meaning:",
+                "pairs": [
+                    { "term": "VLAN", "match": "Logical separation of network" },
+                    { "term": "Access Port", "match": "Port for single VLAN" },
+                    { "term": "Trunk Port", "match": "Port carrying multiple VLANs" },
+                    { "term": "Latency", "match": "Delay in communication" },
+                    { "term": "Ping", "match": "Test connectivity" },
+                    { "term": "MAC Address", "match": "Unique hardware address" },
+                    { "term": "ARP", "match": "Find MAC from IP" },
+                    { "term": "Broadcast", "match": "One sender to all" }
+                ]
+            },
+            {
+                "id": 48,
+                "type": "matching",
+                "question": "Match the protocol with its use:",
+                "pairs": [
+                    { "term": "HTTP", "match": "Web page transfer" },
+                    { "term": "FTP", "match": "File transfer" },
+                    { "term": "DHCP", "match": "Auto IP assignment" },
+                    { "term": "DNS", "match": "Name to IP conversion" },
+                    { "term": "SNMP", "match": "Network monitoring" },
+                    { "term": "NTP", "match": "Time synchronization" },
+                    { "term": "SSH", "match": "Secure remote login" },
+                    { "term": "ICMP", "match": "Ping and error messages" }
+                ]
+            },
+            {
+                "id": 49,
+                "type": "matching",
+                "question": "Match the cable type with its use:",
+                "pairs": [
+                    { "term": "Straight-through", "match": "Connect different devices" },
+                    { "term": "Crossover", "match": "Connect same type devices" },
+                    { "term": "CAT5 Cable", "match": "Standard Ethernet cable" },
+                    { "term": "Fiber Optic", "match": "Uses light for data" },
+                    { "term": "Console Cable", "match": "Direct device configuration" },
+                    { "term": "RJ45", "match": "Network cable connector" }
+                ]
+            },
+            {
+                "id": 50,
+                "type": "matching",
+                "question": "Match the concept with its explanation:",
+                "pairs": [
+                    { "term": "Default Gateway", "match": "Exit point for unknown destinations" },
+                    { "term": "Static Route", "match": "Manually configured path" },
+                    { "term": "Default Route", "match": "Route for unknown networks (0.0.0.0/0)" },
+                    { "term": "Route Summarization", "match": "Combining multiple routes into one" },
+                    { "term": "Longest Prefix Match", "match": "Router chooses most specific route" },
+                    { "term": "Null0 Route", "match": "Route that discards packets" },
+                    { "term": "ACL", "match": "Rules to allow or block traffic" },
+                    { "term": "Session", "match": "Conversation between two devices" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function startQuiz() {
+            window.questions = shuffleArray(questions);
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('startContainer').style.display = 'none';
+            document.getElementById('resultsContainer').classList.remove('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const container = document.getElementById('questionContainer');
+            container.innerHTML = '';
+            container.classList.add('active');
+
+            const q = window.questions[currentQuestion];
+            updateProgress();
+
+            const typeBadge = document.createElement('div');
+            typeBadge.className = 'type-badge';
+            typeBadge.textContent = q.type.toUpperCase();
+            container.appendChild(typeBadge);
+
+            const questionNum = document.createElement('div');
+            questionNum.className = 'question-number';
+            questionNum.textContent = `Question ${currentQuestion + 1} of ${window.questions.length}`;
+            container.appendChild(questionNum);
+
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = q.question;
+            container.appendChild(questionText);
+
+            if (q.type === 'mcq') {
+                renderMCQ(container, q);
+            } else if (q.type === 'truefalse') {
+                renderTrueFalse(container, q);
+            } else if (q.type === 'matching') {
+                renderMatching(container, q);
+            }
+
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderMCQ(container, q) {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = `
+                    <span class="option-letter">${letters[index]}</span>
+                    <span>${option}</span>
+                `;
+                optionDiv.onclick = () => selectMCQ(index, q);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            container.appendChild(optionsContainer);
+
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.id = 'explanation';
+            explanation.innerHTML = `<strong>💡 Explanation:</strong> ${q.explanation}`;
+            container.appendChild(explanation);
+
+            addButton(container, 'Next Question', () => nextQuestion());
+        }
+
+        function selectMCQ(selectedIndex, q) {
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, idx) => {
+                opt.classList.add('disabled');
+                if (idx === q.correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (idx === selectedIndex && idx !== q.correctAnswer) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            if (selectedIndex === q.correctAnswer) {
+                score++;
+            }
+
+            document.getElementById('explanation').classList.add('show');
+            updateProgress();
+        }
+
+        function renderTrueFalse(container, q) {
+            const tfContainer = document.createElement('div');
+            tfContainer.className = 'truefalse-container';
+
+            const trueBtn = document.createElement('div');
+            trueBtn.className = 'truefalse-btn';
+            trueBtn.textContent = '✅ TRUE';
+            trueBtn.onclick = () => selectTrueFalse(true, q);
+
+            const falseBtn = document.createElement('div');
+            falseBtn.className = 'truefalse-btn';
+            falseBtn.textContent = '❌ FALSE';
+            falseBtn.onclick = () => selectTrueFalse(false, q);
+
+            tfContainer.appendChild(trueBtn);
+            tfContainer.appendChild(falseBtn);
+            container.appendChild(tfContainer);
+
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.id = 'explanation';
+            explanation.innerHTML = `<strong>💡 Explanation:</strong> ${q.explanation}`;
+            container.appendChild(explanation);
+
+            addButton(container, 'Next Question', () => nextQuestion());
+        }
+
+        function selectTrueFalse(selectedValue, q) {
+            const buttons = document.querySelectorAll('.truefalse-btn');
+            buttons.forEach(btn => btn.classList.add('disabled'));
+
+            if (selectedValue === q.correctAnswer) {
+                if (selectedValue) {
+                    document.querySelector('.truefalse-btn:first-child').classList.add('correct');
+                } else {
+                    document.querySelector('.truefalse-btn:last-child').classList.add('correct');
+                }
+                score++;
+            } else {
+                if (selectedValue) {
+                    document.querySelector('.truefalse-btn:first-child').classList.add('wrong');
+                } else {
+                    document.querySelector('.truefalse-btn:last-child').classList.add('wrong');
+                }
+                if (q.correctAnswer) {
+                    document.querySelector('.truefalse-btn:first-child').classList.add('correct');
+                } else {
+                    document.querySelector('.truefalse-btn:last-child').classList.add('correct');
+                }
+            }
+
+            document.getElementById('explanation').classList.add('show');
+            updateProgress();
+        }
+
+        function renderMatching(container, q) {
+            const matchingContainer = document.createElement('div');
+            matchingContainer.className = 'matching-container';
+
+            const terms = q.pairs.map(p => p.term);
+            const matches = shuffleArray(q.pairs.map(p => p.match));
+
+            q.pairs.forEach((pair, index) => {
+                const row = document.createElement('div');
+                row.className = 'matching-row';
+
+                const termDiv = document.createElement('div');
+                termDiv.className = 'matching-term';
+                termDiv.textContent = pair.term;
+
+                const arrow = document.createElement('div');
+                arrow.className = 'matching-arrow';
+                arrow.textContent = '→';
+
+                const select = document.createElement('select');
+                select.className = 'matching-select';
+                select.innerHTML = '<option value="">Select match...</option>';
+                
+                const shuffledMatches = shuffleArray([...matches]);
+                shuffledMatches.forEach(match => {
+                    const option = document.createElement('option');
+                    option.value = match;
+                    option.textContent = match;
+                    select.appendChild(option);
+                });
+
+                select.dataset.correctAnswer = pair.match;
+                select.onchange = () => checkMatchingAnswer(select);
+
+                row.appendChild(termDiv);
+                row.appendChild(arrow);
+                row.appendChild(select);
+                matchingContainer.appendChild(row);
+            });
+
+            container.appendChild(matchingContainer);
+
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.id = 'explanation';
+            explanation.innerHTML = `<strong>💡 Match:</strong><br>${q.pairs.map(p => `${p.term} ↔ ${p.match}`).join('<br>')}`;
+            container.appendChild(explanation);
+
+            addButton(container, 'Check & Next', () => checkMatchingAndNext(q));
+        }
+
+        function checkMatchingAnswer(select) {
+            const correct = select.dataset.correctAnswer;
+            const selected = select.value;
+
+            if (selected) {
+                if (selected === correct) {
+                    select.classList.add('correct');
+                    select.classList.remove('wrong');
+                } else {
+                    select.classList.add('wrong');
+                    select.classList.remove('correct');
+                }
+            }
+        }
+
+        function checkMatchingAndNext(q) {
+            const selects = document.querySelectorAll('.matching-select');
+            let correctCount = 0;
+
+            selects.forEach(select => {
+                if (select.value === select.dataset.correctAnswer) {
+                    correctCount++;
+                }
+                select.disabled = true;
+            });
+
+            score += correctCount;
+
+            document.getElementById('explanation').classList.add('show');
+            updateProgress();
+            nextQuestion();
+        }
+
+        function addButton(container, text, onClick) {
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'btn-container';
+
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.textContent = text;
+            btn.onclick = onClick;
+
+            btnContainer.appendChild(btn);
+            container.appendChild(btnContainer);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < window.questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / window.questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionContainer').classList.remove('active');
+            document.getElementById('resultsContainer').classList.add('active');
+            document.getElementById('progressFill').style.width = '100%';
+
+            document.getElementById('scoreNumber').textContent = score;
+            document.getElementById('totalQuestions').textContent = window.questions.length;
+
+            const percentage = (score / window.questions.length) * 100;
+            let message = '';
+
+            if (percentage >= 90) {
+                message = '🎉 Excellent! You\'re a networking pro!';
+            } else if (percentage >= 70) {
+                message = '👍 Great job! You know your stuff!';
+            } else if (percentage >= 50) {
+                message = '📚 Good effort! Keep learning!';
+            } else {
+                message = '💪 Don\'t give up! Practice makes perfect!';
+            }
+
+            document.getElementById('resultMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            window.questions = shuffleArray(questions);
+            document.getElementById('resultsContainer').classList.remove('active');
+            showQuestion();
+        }
+    </script>
 </body>
 </html>
