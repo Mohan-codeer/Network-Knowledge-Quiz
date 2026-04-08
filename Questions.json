@@ -1,0 +1,532 @@
+{
+  "title": "Networking Basics Quiz",
+  "description": "Test your knowledge of networking terms with simple, everyday examples!",
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "What is a Client in computer networking?",
+      "options": [
+        "A device that provides service",
+        "A device that requests service",
+        "A type of cable",
+        "A security guard"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Just like a customer ordering food at a restaurant, a client is a device that requests service from a server."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "What is a Server?",
+      "options": [
+        "A device that requests service",
+        "A device that provides service",
+        "A wireless signal",
+        "A type of website"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Just like a restaurant kitchen prepares food for customers, a server provides service to clients."
+    },
+    {
+      "id": 3,
+      "type": "truefalse",
+      "question": "When you open a website on your laptop, your laptop acts as a client.",
+      "correctAnswer": true,
+      "explanation": "Yes! Your laptop is requesting the website content, so it acts as a client."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "What is a Router like in daily life?",
+      "options": [
+        "A delivery truck",
+        "A traffic police officer directing vehicles",
+        "A telephone operator",
+        "A security guard at a building"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A router directs data to the correct destination, just like a traffic police officer directs vehicles."
+    },
+    {
+      "id": 5,
+      "type": "truefalse",
+      "question": "A router is the same thing as a WiFi device at home.",
+      "correctAnswer": true,
+      "explanation": "Yes! The WiFi device you have at home is actually a router that connects your devices to the internet."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "What is an IP address compared to in daily life?",
+      "options": [
+        "A phone charger",
+        "A house address",
+        "A door lock",
+        "A light switch"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Just like a house address helps courier reach the right house, an IP address helps data reach the right device."
+    },
+    {
+      "id": 7,
+      "type": "truefalse",
+      "question": "Every device connected to a network needs its own IP address.",
+      "correctAnswer": true,
+      "explanation": "Yes! Just like every house has a unique address, every device needs a unique IP address."
+    },
+    {
+      "id": 8,
+      "type": "mcq",
+      "question": "What does DNS do?",
+      "options": [
+        "Delivers emails",
+        "Converts website names to IP addresses",
+        "Blocks websites",
+        "Speeds up internet"
+      ],
+      "correctAnswer": 1,
+      "explanation": "DNS is like your phone's contact list - you remember the name (google.com), and DNS finds the number (IP address)."
+    },
+    {
+      "id": 9,
+      "type": "truefalse",
+      "question": "When you type 'google.com', your computer first asks DNS to find the IP address.",
+      "correctAnswer": true,
+      "explanation": "Correct! DNS acts like a phone book, converting the website name to an IP address your computer can understand."
+    },
+    {
+      "id": 10,
+      "type": "mcq",
+      "question": "What is DHCP compared to in daily life?",
+      "options": [
+        "Hotel check-in that automatically assigns room numbers",
+        "A manual address book",
+        "A security guard checking IDs",
+        "A telephone operator"
+      ],
+      "correctAnswer": 0,
+      "explanation": "DHCP automatically gives IP addresses to devices, just like a hotel automatically assigns room numbers to guests."
+    },
+    {
+      "id": 11,
+      "type": "truefalse",
+      "question": "Without DHCP, you would need to manually type an IP address for each device.",
+      "correctAnswer": true,
+      "explanation": "Exactly! Without DHCP, it's like having to manually pick a room number every time you stay at a hotel."
+    },
+    {
+      "id": 12,
+      "type": "mcq",
+      "question": "What is a Network Cable used for?",
+      "options": [
+        "Charging phones",
+        "Connecting network devices so data can travel",
+        "Watching TV",
+        "Printing documents"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A network cable is like a water pipe - it carries data between devices just like a pipe carries water between houses."
+    },
+    {
+      "id": 13,
+      "type": "truefalse",
+      "question": "A straight-through cable is used to connect two different types of devices.",
+      "correctAnswer": true,
+      "explanation": "Correct! Straight-through cables connect different devices, like a computer to a switch."
+    },
+    {
+      "id": 14,
+      "type": "mcq",
+      "question": "What is a Firewall compared to in daily life?",
+      "options": [
+        "Airport security system",
+        "A door handle",
+        "A telephone",
+        "A light bulb"
+      ],
+      "correctAnswer": 0,
+      "explanation": "A firewall checks all traffic coming in and out, like airport security checking passengers and luggage."
+    },
+    {
+      "id": 15,
+      "type": "truefalse",
+      "question": "A firewall can block dangerous traffic from entering your network.",
+      "correctAnswer": true,
+      "explanation": "Yes! Just like airport security blocks prohibited items, a firewall blocks harmful traffic."
+    },
+    {
+      "id": 16,
+      "type": "mcq",
+      "question": "What does the ping command do?",
+      "options": [
+        "Sends emails",
+        "Tests if a device is reachable",
+        "Creates a folder",
+        "Opens a website"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Ping is like making a phone call to check if someone is available - it tests connectivity."
+    },
+    {
+      "id": 17,
+      "type": "truefalse",
+      "question": "Ping uses a protocol called ICMP to test connectivity.",
+      "correctAnswer": true,
+      "explanation": "Correct! ICMP (Internet Control Message Protocol) is the protocol used by ping to test connectivity."
+    },
+    {
+      "id": 18,
+      "type": "mcq",
+      "question": "What is Latency in simple terms?",
+      "options": [
+        "Internet speed",
+        "Delay in communication",
+        "Amount of data",
+        "Number of devices"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Latency is the delay in communication - like the delay you sometimes hear in a phone call."
+    },
+    {
+      "id": 19,
+      "type": "truefalse",
+      "question": "Higher latency means longer delay in receiving data.",
+      "correctAnswer": true,
+      "explanation": "Yes! Latency is measured in milliseconds (ms) - higher means more delay."
+    },
+    {
+      "id": 20,
+      "type": "mcq",
+      "question": "What is a VLAN in simple terms?",
+      "options": [
+        "A type of virus",
+        "Logically separates networks inside the same device",
+        "A wireless signal",
+        "A type of cable"
+      ],
+      "correctAnswer": 1,
+      "explanation": "VLAN is like dividing an office building into different departments - they're physically in the same building but logically separated."
+    },
+    {
+      "id": 21,
+      "type": "truefalse",
+      "question": "An Access Port on a switch carries multiple VLANs.",
+      "correctAnswer": false,
+      "explanation": "No! An Access Port belongs to a single VLAN (like one department). A Trunk Port carries multiple VLANs."
+    },
+    {
+      "id": 22,
+      "type": "mcq",
+      "question": "What is the Default Gateway?",
+      "options": [
+        "The main exit gate of your network",
+        "A special website",
+        "A type of password",
+        "A wireless router name"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The Default Gateway is like the main exit gate of an apartment - all outside traffic goes through it."
+    },
+    {
+      "id": 23,
+      "type": "truefalse",
+      "question": "The Default Gateway is usually the router's IP address in your home network.",
+      "correctAnswer": true,
+      "explanation": "Yes! In home networks, your router's IP address (often 192.168.1.1) is the default gateway."
+    },
+    {
+      "id": 24,
+      "type": "mcq",
+      "question": "What is MAC Address compared to in daily life?",
+      "options": [
+        "A vehicle chassis number given by manufacturer",
+        "A house address",
+        "A phone number",
+        "A door lock code"
+      ],
+      "correctAnswer": 0,
+      "explanation": "A MAC address is like a vehicle chassis number - it's a unique hardware address given by the manufacturer."
+    },
+    {
+      "id": 25,
+      "type": "truefalse",
+      "question": "MAC addresses are used to find the exact hardware device on a network.",
+      "correctAnswer": true,
+      "explanation": "Correct! While IP addresses are logical, MAC addresses are physical unique addresses built into network devices."
+    },
+    {
+      "id": 26,
+      "type": "mcq",
+      "question": "What does ARP do?",
+      "options": [
+        "Sends emails",
+        "Finds MAC address using IP address",
+        "Blocks websites",
+        "Creates passwords"
+      ],
+      "correctAnswer": 1,
+      "explanation": "ARP is like finding someone's phone number using their name - it finds the MAC address when you know the IP."
+    },
+    {
+      "id": 27,
+      "type": "truefalse",
+      "question": "Broadcast means sending a message to ALL devices in the network.",
+      "correctAnswer": true,
+      "explanation": "Yes! Broadcast is like a teacher making an announcement to the entire class - one sender to everyone."
+    },
+    {
+      "id": 28,
+      "type": "mcq",
+      "question": "What is Unicast?",
+      "options": [
+        "One sender to all devices",
+        "One sender to one receiver",
+        "One sender to a selected group",
+        "No communication"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Unicast is like a phone call - one person talking to one specific person."
+    },
+    {
+      "id": 29,
+      "type": "truefalse",
+      "question": "Multicast is like sending an invitation to only specific people in a group.",
+      "correctAnswer": true,
+      "explanation": "Correct! Multicast is like an online meeting - one sender to a selected group of participants."
+    },
+    {
+      "id": 30,
+      "type": "mcq",
+      "question": "What is the main difference between Telnet and SSH?",
+      "options": [
+        "SSH is faster",
+        "SSH is more secure with encryption",
+        "Telnet is newer",
+        "There is no difference"
+      ],
+      "correctAnswer": 1,
+      "explanation": "SSH is like having a conversation in a locked room - it's secure. Telnet is like talking loudly in public - anyone can hear your password!"
+    },
+    {
+      "id": 31,
+      "type": "truefalse",
+      "question": "SSH encrypts your password when logging in remotely, making it secure.",
+      "correctAnswer": true,
+      "explanation": "Yes! That's the key advantage of SSH over Telnet - your credentials are encrypted."
+    },
+    {
+      "id": 32,
+      "type": "mcq",
+      "question": "What is Console cable used for?",
+      "options": [
+        "Connecting to the internet wirelessly",
+        "Direct cable connection to configure a network device",
+        "Charging laptops",
+        "Connecting speakers"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Console cable is like a repair technician directly connecting to a machine - it's for direct device configuration."
+    },
+    {
+      "id": 33,
+      "type": "truefalse",
+      "question": "Console connection doesn't require internet - it connects directly to the device.",
+      "correctAnswer": true,
+      "explanation": "Correct! Console cable connects your laptop directly to the router - no network needed."
+    },
+    {
+      "id": 34,
+      "type": "mcq",
+      "question": "What is CLI in networking?",
+      "options": [
+        "A graphical interface with buttons",
+        "Text-based method to configure devices by typing commands",
+        "A type of cable",
+        "A wireless signal"
+      ],
+      "correctAnswer": 1,
+      "explanation": "CLI (Command Line Interface) is like typing a message instead of using voice - you type commands to control devices."
+    },
+    {
+      "id": 35,
+      "type": "truefalse",
+      "question": "CLI commands like 'show ip route' display the routing table of a router.",
+      "correctAnswer": true,
+      "explanation": "Yes! 'show ip route' is a CLI command that shows all known routes in the router."
+    },
+    {
+      "id": 36,
+      "type": "mcq",
+      "question": "What is FTP used for?",
+      "options": [
+        "Sending text messages",
+        "Transferring files between computers",
+        "Watching videos",
+        "Playing games"
+      ],
+      "correctAnswer": 1,
+      "explanation": "FTP (File Transfer Protocol) is like sending files via courier - it's used to transfer files to/from servers."
+    },
+    {
+      "id": 37,
+      "type": "truefalse",
+      "question": "FTP is commonly used to upload website files to a web server.",
+      "correctAnswer": true,
+      "explanation": "Correct! Web developers use FTP to upload their website files to hosting servers."
+    },
+    {
+      "id": 38,
+      "type": "mcq",
+      "question": "What is SNMP used for?",
+      "options": [
+        "Transferring files",
+        "Monitoring network devices",
+        "Sending emails",
+        "Blocking websites"
+      ],
+      "correctAnswer": 1,
+      "explanation": "SNMP (Simple Network Management Protocol) is like a CCTV control room - it monitors network devices."
+    },
+    {
+      "id": 39,
+      "type": "truefalse",
+      "question": "NTP (Network Time Protocol) synchronizes time across all network devices.",
+      "correctAnswer": true,
+      "explanation": "Yes! NTP makes sure all routers and devices show the same time, like synchronized clocks."
+    },
+    {
+      "id": 40,
+      "type": "mcq",
+      "question": "What is the difference between TCP and UDP?",
+      "options": [
+        "They are the same",
+        "TCP is reliable but slower, UDP is faster but less reliable",
+        "TCP is wireless",
+        "UDP is more secure"
+      ],
+      "correctAnswer": 1,
+      "explanation": "TCP is like registered post (reliable but slower), UDP is like normal post (faster but less reliable)."
+    },
+    {
+      "id": 41,
+      "type": "truefalse",
+      "question": "Streaming videos uses UDP because speed matters more than perfect delivery.",
+      "correctAnswer": true,
+      "explanation": "Correct! Video streaming uses UDP - if a frame is missed, it just moves on rather than waiting for retransmission."
+    },
+    {
+      "id": 42,
+      "type": "mcq",
+      "question": "What is Packet Loss?",
+      "options": [
+        "Data lost during transmission",
+        "Password not working",
+        "Website not loading",
+        "Internet too fast"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Packet loss is like voice breaking during a phone call - some data doesn't reach the destination."
+    },
+    {
+      "id": 43,
+      "type": "truefalse",
+      "question": "Jitter is the variation in delay during communication.",
+      "correctAnswer": true,
+      "explanation": "Yes! Jitter is like disturbance in a video call - sometimes fast, sometimes slow delays."
+    },
+    {
+      "id": 44,
+      "type": "mcq",
+      "question": "What is Inter-VLAN Routing?",
+      "options": [
+        "Connecting different VLANs so they can communicate",
+        "Blocking all traffic",
+        "Creating a new VLAN",
+        "Deleting a network"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Inter-VLAN routing is like having a post office connect different departments - it allows different VLANs to communicate."
+    },
+    {
+      "id": 45,
+      "type": "truefalse",
+      "question": "Devices in different VLANs cannot communicate without Inter-VLAN routing.",
+      "correctAnswer": true,
+      "explanation": "Correct! Each VLAN is like a separate network - they need a router to communicate with each other."
+    },
+    {
+      "id": 46,
+      "type": "matching",
+      "question": "Match the networking term with its daily life example:",
+      "pairs": [
+        { "term": "Client", "match": "Customer ordering food" },
+        { "term": "Server", "match": "Restaurant kitchen preparing food" },
+        { "term": "Router", "match": "Traffic police officer" },
+        { "term": "IP Address", "match": "House address" },
+        { "term": "DNS", "match": "Mobile contact list" },
+        { "term": "DHCP", "match": "Hotel assigning room numbers" },
+        { "term": "Firewall", "match": "Airport security" },
+        { "term": "Packet", "match": "Courier package" }
+      ]
+    },
+    {
+      "id": 47,
+      "type": "matching",
+      "question": "Match the term with its meaning:",
+      "pairs": [
+        { "term": "VLAN", "match": "Logical separation of network" },
+        { "term": "Access Port", "match": "Port for single VLAN" },
+        { "term": "Trunk Port", "match": "Port carrying multiple VLANs" },
+        { "term": "Latency", "match": "Delay in communication" },
+        { "term": "Ping", "match": "Test connectivity" },
+        { "term": "MAC Address", "match": "Unique hardware address" },
+        { "term": "ARP", "match": "Find MAC from IP" },
+        { "term": "Broadcast", "match": "One sender to all" }
+      ]
+    },
+    {
+      "id": 48,
+      "type": "matching",
+      "question": "Match the protocol with its use:",
+      "pairs": [
+        { "term": "HTTP", "match": "Web page transfer" },
+        { "term": "FTP", "match": "File transfer" },
+        { "term": "DHCP", "match": "Auto IP assignment" },
+        { "term": "DNS", "match": "Name to IP conversion" },
+        { "term": "SNMP", "match": "Network monitoring" },
+        { "term": "NTP", "match": "Time synchronization" },
+        { "term": "SSH", "match": "Secure remote login" },
+        { "term": "ICMP", "match": "Ping and error messages" }
+      ]
+    },
+    {
+      "id": 49,
+      "type": "matching",
+      "question": "Match the cable type with its use:",
+      "pairs": [
+        { "term": "Straight-through", "match": "Connect different devices" },
+        { "term": "Crossover", "match": "Connect same type devices" },
+        { "term": "CAT5 Cable", "match": "Standard Ethernet cable" },
+        { "term": "Fiber Optic", "match": "Uses light for data" },
+        { "term": "Console Cable", "match": "Direct device configuration" },
+        { "term": "RJ45", "match": "Network cable connector" }
+      ]
+    },
+    {
+      "id": 50,
+      "type": "matching",
+      "question": "Match the concept with its explanation:",
+      "pairs": [
+        { "term": "Default Gateway", "match": "Exit point for unknown destinations" },
+        { "term": "Static Route", "match": "Manually configured path" },
+        { "term": "Default Route", "match": "Route for unknown networks (0.0.0.0/0)" },
+        { "term": "Route Summarization", "match": "Combining multiple routes into one" },
+        { "term": "Longest Prefix Match", "match": "Router chooses most specific route" },
+        { "term": "Null0 Route", "match": "Route that discards packets" },
+        { "term": "ACL", "match": "Rules to allow or block traffic" },
+        { "term": "Session", "match": "Conversation between two devices" }
+      ]
+    }
+  ]
+}
