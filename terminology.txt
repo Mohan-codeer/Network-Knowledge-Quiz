@@ -1,0 +1,653 @@
+Below is the terminology using simple language + daily life examples.
+
+Client and Server
+Client
+Meaning: device that requests service.
+Examples:
+Laptop opening website 
+Mobile using WhatsApp 
+Browser requesting Google page 
+Simple example:
+Customer ordering food.
+
+Server
+Meaning: device that provides service.
+Examples:
+Website server 
+Email server 
+Database server 
+Simple example:
+Restaurant kitchen preparing food.
+
+Client–Server communication
+Client  → request →  Server
+Client  ← response ← Server
+Example:
+You search google.com
+your PC = client 
+Google computer = server 
+
+Interface
+Meaning: connection point on device.
+Examples:
+Router port 
+Switch port 
+Laptop ethernet port 
+Simple example:
+Door of house 🚪
+People enter/exit through door.
+
+Types of interfaces
+
+Example Cisco interface
+GigabitEthernet0/0
+GigabitEthernet0/1
+FastEthernet0/1
+
+What is a Network Cable?
+Network Cable
+Meaning: wire used to connect network devices so data can travel.
+Example:
+Like a water pipe carrying water between houses.
+
+CAT5 Cable (Category 5)  -------------------------- LAN/ETHERNET CABLE -------------STANDARDS
+CAT5
+Meaning: standard Ethernet cable used for networking.
+Full form:  Category 5 cable
+Used for:
+PC to switch 
+switch to router 
+router to router (Ethernet port) 
+Speed
+
+Simple example
+CAT5 cable = common internet wire used in offices.
+Looks like: plastic wire with RJ45 connector
+Connector name: RJ45
+Maximum length support upto 100Meters
+
+Straight-through cable
+Straight cable
+Meaning: same wire color order on both ends.
+Used to connect different devices.
+
+Used between:
+
+Simple example
+Customer talking to shopkeeper.
+Different roles.
+
+Rule
+Different device types → Straight cable
+
+Crossover cable
+Meaning: wire colors different on each end.
+Used to connect same type devices.
+Used between:
+
+Simple example
+Two managers talking directly.
+Same role
+Rule:   Same device types → Crossover cable
+
+Optical Fiber Cable
+Meaning: cable that uses light to send data.
+Features
+
+Used for
+internet backbone 
+ISP connections ----MEANS ---ISP  to ISP
+data centers 
+long distance communication 
+Simple example
+Laser light carrying information.
+
+Copper vs fiber
+
+
+Router, Route, Network
+Router
+Meaning: Device that sends data to the correct place.
+Example: Router is like a traffic police officer 🚦 directing vehicles.
+
+Network
+Meaning: Group of connected devices.
+Example: Your home WiFi connecting mobile, laptop, TV.
+
+Route
+Meaning: Path used to reach destination.
+Example: Google Maps showing route from home to office.
+
+Routing table
+Meaning: Router’s list of known routes.
+Example: Notebook containing directions to many places.
+
+Next hop
+Meaning: Next stop on the way.
+Example: Bus changing at a junction.
+
+Packet and IP address
+Packet
+Meaning: Small piece of data travelling in network.
+Example: Courier package 📦.
+
+IP address
+Meaning: Unique address of device.
+Example: House address.
+
+Interface
+Meaning: Router port where cable connects.
+Example:  Door of house.
+
+Static route
+Meaning: Path manually configured.
+Example: You always take same road to office.
+
+Why used?
+When path is fixed and simple.
+Example: Home → Office same daily route.
+
+Default route
+Meaning: Route used when router doesn't know destination.
+0.0.0.0/0
+Example: If you don’t know exact shop, go to main market.
+
+Unknown network
+Meaning: Destination not present in routing table.
+Example: Someone asks address of a village you never heard.
+You ask main bus stand person.
+
+Gateway of last resort
+Meaning: backup path for unknown destinations.
+Example:  Ask post office if address not known.
+
+Route Summarization
+Meaning: combining many routes into one.
+Example networks:
+172.16.1.0/24
+172.16.2.0/24
+172.16.3.0/24
+Summary: 172.16.0.0/16
+
+Simple example
+Instead of remembering:
+House 1 street A
+House 2 street A
+House 3 street A
+just say: Street A
+
+Why summarization?
+
+Longest Prefix Match (LPM)
+Meaning
+Router chooses most specific route.
+Example:
+172.16.1.0/24
+172.16.0.0/16
+Destination: 172.16.1.5
+Router selects: 172.16.1.0/24
+because more specific.
+
+Example
+Address:
+Flat 101
+Apartment A
+City Hyderabad
+Country India
+Most specific: Flat 101
+
+Null0 Route
+Meaning: route that discards packets.
+Example: Dustbin 🗑️.
+Packet goes → discarded.
+
+Why used?
+Prevent routing loops.
+Block unwanted traffic.
+
+Example: ip route 172.16.0.0 255.255.0.0 null0
+meaning: If packet comes for unknown subnet inside 172.16, drop safely.
+
+8. ACL (Access Control List)
+ACL
+Meaning: list of rules to allow or block traffic.
+Example: Security guard list.
+Allow: employees
+Block: unknown visitors
+
+Permit
+Allow traffic.
+Example: allow known person into office.
+
+Deny
+Block traffic.
+Example: security stops stranger.
+
+Rule
+Condition to check traffic.
+Example: allow only ID card holders.
+
+Standard ACL
+Filters only source IP.
+Example: allow students from classroom A.
+
+Extended ACL
+Filters based on:
+IP
+port
+protocol
+Example: allow only WhatsApp, block YouTube.
+
+IN and OUT direction
+IN
+Rule applied when traffic enters router.
+Example: Security check at gate.
+OUT
+Rule applied when traffic leaves router.
+Example: Checking bag while exiting airport.
+
+Firewall
+Advanced security device.
+Example: Airport security system.
+Checks: 
+identity
+baggage
+permission
+
+Difference between ACL and Firewall
+
+Stateless vs Stateful
+Stateless
+Checks each packet separately.
+Does not remember previous packets.
+Example: Security guard checking each visitor without memory.
+
+Stateful
+Remembers communication.
+Example: Receptionist remembering visitor entry.
+
+Session
+Conversation between two devices.
+Example: Phone call 📞.
+Start → talk → end
+
+Session table
+Firewall memory storing active sessions.
+Example: hotel register storing guest details.
+
+Protocol
+Communication rule.
+Example: language used for conversation.
+
+TCP handshake
+Process to start session.
+Steps:
+SYN
+SYN ACK
+ACK
+Example:
+Person A: hello
+Person B: hello
+Person A: start talking
+
+TCP
+Reliable communication.
+Example: registered post.
+
+UDP
+Fast but less reliable.
+Example: normal post.
+
+Port
+Communication channel.
+Example: different service counters.
+
+Common ports:
+
+
+Troubleshooting commands meaning
+ping
+Checks connectivity.
+Example: checking if phone call connects.
+
+traceroute
+Shows path to destination.
+Example: tracking courier route.
+
+show ip route
+Displays routing table.
+Example: viewing map.
+
+show access-list
+Displays ACL rules.
+Example: viewing security rules list.
+
+Simple story to explain whole concept
+Computer wants to open website.
+Steps:
+packet created
+router checks route
+if route known → forward
+if unknown → use default route
+firewall checks rules
+session created
+response comes back using same session
+
+CLI (Command Line Interface)
+Meaning: text-based method to configure device.
+You type commands.
+Example:
+show ip route
+configure terminal
+interface g0/0
+
+Simple example
+Instead of clicking buttons, you type instructions.
+Like: typing message instead of voice call.
+
+Why CLI used?
+precise control 
+faster configuration 
+widely used in networking 
+
+Console
+Meaning: direct cable connection to configure device.
+Used when:
+device new
+network not working
+
+Example
+Laptop connected directly to router using console cable.
+No internet required.
+
+Simple example
+Repair technician directly connecting to machine.
+
+Console cable
+Usually light blue cable in Packet Tracer.
+Connection: PC → Router console port.
+
+Telnet
+Meaning: remote login to device using network.
+Uses CLI remotely.
+
+Example
+You login to router from another computer.
+Command: telnet 192.168.1.1
+
+Problem with telnet
+Not secure.
+Password visible in network.
+
+Simple example
+Talking loudly in public place.
+Anyone can hear.
+
+SSH (Secure Shell)
+Meaning: secure remote login method.
+Encrypted communication.
+
+Example command
+ssh admin@192.168.1.1
+
+Advantage over telnet
+Password encrypted.
+Secure communication.
+
+Simple example
+Talking in locked room.
+No one else can hear.
+
+Console vs Telnet vs SSH
+
+How everything connects together
+Example network:
+Client PC
+   |
+Ethernet cable
+   |
+Switch
+   |
+Router
+   |
+Internet
+   |
+Server (Ex. YouTube Server)
+
+Simple teaching story
+Person wants to open website.
+Steps:
+Client sends request 
+travels through cable 
+enters router interface 
+router forwards packet 
+server sends response 
+
+Basic CLI commands for practice
+check interfaces - show ip interface brief
+
+check routing table - show ip route
+
+check connected devices - show cdp neighbors
+
+enter configuration mode - configure terminal
+
+configure interface
+interface g0/0
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+
+Very short revision
+Client:  device requesting service.
+Server: device providing service.
+Interface: port on router/switch.
+Cable: wire connecting devices.
+CLI: text-based configuration.
+Console: direct connection.
+Telnet: remote login (not secure).
+SSH: remote login (secure).
+
+IP Address, Subnet Mask, Gateway, DNS
+IP Address
+Meaning: Unique number given to each device in network.
+Example: 192.168.1.10
+Real life example: House address.
+Without address, courier cannot deliver.
+
+Subnet Mask
+Meaning: tells which part of IP is network and which part is device.
+Example: 255.255.255.0
+Simple example: Apartment address:
+Building number = network
+Flat number = device
+
+Default Gateway
+Meaning: router address used to reach other networks.
+Example: 192.168.1.1
+Simple example:
+Main exit gate of apartment.
+All outside travel goes through gate.
+
+DNS (Domain Name System)
+Meaning: converts website name into IP address.
+Example: google.com → 142.250.183.206
+Simple example: Mobile contact list.
+You remember name, phone remembers number.
+Network Services Protocols
+DHCP (Dynamic Host Configuration Protocol)
+Meaning: automatically gives IP address to devices.
+Without DHCP: you must manually configure IP.
+Simple example: Hotel automatically assigning room number.
+
+FTP (File Transfer Protocol)
+Meaning: used to transfer files.
+Example: upload website files to server.
+Simple example: Sending files via courier.
+
+TFTP (Trivial FTP)
+Meaning: simple version of FTP.
+Used for:
+router backup 
+IOS image transfer 
+Simple example: basic file copy without security.
+
+SNMP (Simple Network Management Protocol)
+Meaning: used to monitor network devices.
+Example: checking router CPU, memory.
+
+NMS (Network Management System)
+Meaning: software used to manage network.
+Examples: monitor many routers from one screen.
+Simple example: CCTV control room monitoring many cameras.
+
+NTP (Network Time Protocol)
+Meaning: synchronizes time across devices.
+Example: all routers show same time.
+Simple example: all clocks showing same time.
+
+VLAN, Access, Trunk
+VLAN (Virtual LAN)
+Meaning: logically separates network inside same switch.
+Example: Accounts department separate from HR.
+
+Example
+Switch has 1 device but 2 VLANs:
+VLAN 10 → students
+VLAN 20 → staff
+Devices separated logically.
+
+Access Port
+Meaning: port belonging to single VLAN.
+Used for: PC connection.
+Example: PC connected to VLAN 10.
+
+Trunk Port
+Meaning: port carrying multiple VLANs.
+Used between switches.
+Example: Switch1 ↔ Switch2 carrying VLAN10, VLAN20.
+
+Inter-VLAN Routing (Simple Explanation)
+First understand VLAN
+VLAN
+Meaning: dividing one physical network into multiple logical networks.
+Example:
+Office departments:
+Even if all computers connect to same switch, they are separated.
+
+Problem without Inter-VLAN routing
+Devices in different VLANs cannot communicate.
+Example: PC in VLAN10 cannot talk to PC in VLAN20.
+Reason: Each VLAN behaves like separate network.
+
+Inter-VLAN Routing
+Meaning
+Inter-VLAN routing allows communication between different VLANs using router or Layer3 switch.
+
+Simple example
+Different departments want to talk:
+Accounts needs to send file to HR.
+They need common person (router) to connect them.
+Router acts like: translator or post office.
+
+Why Inter-VLAN routing needed
+
+Default gateway in VLAN
+Each VLAN needs gateway.
+Example:
+Gateway configured on router interface.
+
+Latency, Ping, ICMP
+Latency
+Meaning: delay in communication.
+Example: time taken for packet to travel.
+Unit: milliseconds (ms)
+Simple example: delay in phone call voice.
+
+Ping
+Meaning: command to test connectivity.
+Example command: ping 8.8.8.8
+Shows:
+reachable or not 
+delay time 
+
+ICMP (Internet Control Message Protocol)
+Meaning: protocol used by ping.
+Used for:
+error messages 
+connectivity test 
+
+ARP, MAC address
+MAC Address
+Meaning: unique hardware address of device.
+Example:  0:1A:2B:3C:4D:5E
+Given by manufacturer.
+
+Simple example: Vehicle chassis number.
+
+ARP (Address Resolution Protocol)
+Meaning: finds MAC address using IP address.
+Example: PC knows IP but needs MAC to send data.
+
+Simple example: finding person phone number using name.
+
+Broadcast, Unicast, Multicast
+Unicast
+Meaning: one sender to one receiver.
+Example: phone call.
+
+Broadcast
+Meaning: one sender to all devices.
+Example: teacher announcement to entire class.
+IP example: 192.168.1.255
+
+Multicast
+Meaning: one sender to selected group.
+Example: online meeting participants.
+
+Throughput
+actual speed achieved.
+Bandwidth = capacity
+Throughput = actual usage
+
+Packet Loss
+data lost during transmission.
+example: voice breaking in call.
+
+Jitter
+variation in delay.
+example: disturbance in video call.
+8. Simple full story connecting all terms
+When client opens website:
+device gets IP from DHCP 
+uses DNS to find website IP 
+sends packet to gateway 
+router forwards packet 
+ARP finds MAC address 
+packet travels via switch 
+ping uses ICMP to test connectivity 
+latency shows delay 
+VLAN separates departments 
+SNMP monitors devices 
+NTP keeps time same 
+
+9. Very short revision list
+IP address: device identity.
+Subnet mask: defines network size.
+Gateway: exit point of network.
+DNS: name to IP converter.
+DHCP: automatic IP provider.
+FTP: file transfer.
+SNMP: network monitoring.
+NTP: time synchronization.
+VLAN: network separation.
+Access port: single VLAN port.
+Trunk port: multi VLAN port.
+Latency: delay.
+Ping: connectivity test.
+ICMP: protocol for ping.
+ARP: IP to MAC mapping.
+MAC: hardware address.
+Broadcast: one to all.
+Unicast: one to one.
+Multicast: one to group.
+
